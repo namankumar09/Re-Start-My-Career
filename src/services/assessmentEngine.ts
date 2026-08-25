@@ -243,9 +243,9 @@ export function generateRecommendations(
   const topList = scoredCareers.slice(0, 5);
 
   return topList.map(({ career, fitScore }) => {
-    const primDim = career.primaryDimensions[0];
-    const secDim = career.secondaryDimensions[0] || 'Conventional';
-    const tertDim = career.secondaryDimensions[1] || 'Realistic';
+    const primDim = career.primaryDimensions?.[0] || 'Investigative';
+    const secDim = career.secondaryDimensions?.[0] || 'Conventional';
+    const tertDim = career.secondaryDimensions?.[1] || 'Realistic';
 
     const pScore = scores[primDim]?.interestScore || 80;
     const sScore = scores[secDim]?.interestScore || 70;

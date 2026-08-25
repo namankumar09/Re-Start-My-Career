@@ -259,6 +259,14 @@ export class AuthService {
   /**
    * Sign Out
    */
+  static setSessionUser(user: AuthUser): void {
+    this.saveCurrentUser(user);
+  }
+
+  static saveUser(user: AuthUser): void {
+    this.saveCurrentUser(user);
+  }
+
   static signOut(): void {
     this.saveCurrentUser(null);
   }

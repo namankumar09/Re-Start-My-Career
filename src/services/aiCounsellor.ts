@@ -65,14 +65,14 @@ export function generateRuleBasedResponse(
 ): string {
   const q = query.toLowerCase();
   const { profile, result, recommendations } = context;
-  const top1 = result.topDimensions[0];
-  const top2 = result.topDimensions[1];
-  const top3 = result.topDimensions[2];
-  const s1 = result.scores[top1]?.interestScore || 0;
-  const s2 = result.scores[top2]?.interestScore || 0;
-  const c1 = result.scores[top1]?.confidenceScore || 0;
-  const latent = result.highestLatentDimension;
-  const latentGap = result.highestLatentGap;
+  const top1 = result?.topDimensions?.[0] || 'Investigative';
+  const top2 = result?.topDimensions?.[1] || 'Realistic';
+  const top3 = result?.topDimensions?.[2] || 'Conventional';
+  const s1 = result?.scores?.[top1]?.interestScore || 0;
+  const s2 = result?.scores?.[top2]?.interestScore || 0;
+  const c1 = result?.scores?.[top1]?.confidenceScore || 0;
+  const latent = result?.highestLatentDimension;
+  const latentGap = result?.highestLatentGap;
 
   // Question: Parent resistance / family support
   if (q.includes('parent') || q.includes('family') || q.includes('mom') || q.includes('dad') || q.includes('convince')) {

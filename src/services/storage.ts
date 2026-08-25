@@ -8,8 +8,7 @@ import {
   NotificationSettings, 
   AISettings, 
   FeedbackSubmission, 
-  ThemeMode, 
-  SupportedLanguage 
+  ThemeMode 
 } from '../types';
 
 const STORAGE_KEYS = {
@@ -25,7 +24,6 @@ const STORAGE_KEYS = {
   AI_SETTINGS: 'restart_ai_settings',
   FEEDBACK: 'restart_feedback',
   THEME: 'restart_theme',
-  LANGUAGE: 'restart_language',
   AUTH_TOKEN: 'restart_auth_token',
 };
 
@@ -47,7 +45,7 @@ export const defaultAISettings: AISettings = {
 export const defaultNotifications: AppNotification[] = [
   {
     id: 'notif_welcome',
-    title: 'Welcome to re\\start my career',
+    title: 'Welcome to Re\\Start My Career',
     message: 'Find the direction you are drawn to and identify your interest vs confidence signals.',
     type: 'assessment',
     timestamp: new Date().toISOString(),
@@ -63,7 +61,7 @@ export const defaultNotifications: AppNotification[] = [
   },
 ];
 
-// In-memory + LocalStorage unified sync manager
+// LocalStorage persistence manager
 export class StorageService {
   static getProfile(): UserProfile | null {
     try {
@@ -77,7 +75,6 @@ export class StorageService {
   static saveProfile(profile: UserProfile): void {
     try {
       localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
-      // Optional async sync to server
       fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -234,34 +231,38 @@ export class StorageService {
     }
   }
 
-  static saveTheme(theme: ThemeMode): void {
+  static applyThemeToDocument(theme: ThemeMode): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.THEME, theme);
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+      let isDark = theme === 'dark';
+      if (theme === 'system') {
+        isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       }
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        document.documentElement.style.colorScheme = 'light';
+      }
+
+      // Update theme-color meta tag
+      let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (!metaThemeColor) {
+        metaThemeColor = document.createElement('meta');
+        metaThemeColor.setAttribute('name', 'theme-color');
+        document.head.appendChild(metaThemeColor);
+      }
+      metaThemeColor.setAttribute('content', isDark ? '#000000' : '#ffffff');
     } catch {}
   }
 
-  static getLanguage(): SupportedLanguage {
+  static saveTheme(theme: ThemeMode): void {
     try {
-      return (localStorage.getItem(STORAGE_KEYS.LANGUAGE) as SupportedLanguage) || 'en';
-    } catch {
-      return 'en';
-    }
-  }
-
-  static saveLanguage(lang: SupportedLanguage): void {
-    try {
-      localStorage.setItem(STORAGE_KEYS.LANGUAGE, lang);
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+      StorageService.applyThemeToDocument(theme);
     } catch {}
   }
 
@@ -281,7 +282,7 @@ export class StorageService {
   static clearAll(): void {
     try {
       localStorage.clear();
-      document.documentElement.classList.add('dark');
+      StorageService.applyThemeToDocument('dark');
     } catch {}
   }
 }

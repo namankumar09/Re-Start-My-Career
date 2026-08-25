@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   Send, 
-  Trash2, 
   Copy, 
   Check, 
   RotateCcw, 
-  ShieldCheck, 
-  AlertCircle, 
   User as UserIcon,
   Bot
 } from 'lucide-react';
@@ -15,10 +12,8 @@ import {
   UserProfile, 
   AssessmentResult, 
   Recommendation, 
-  ChatMessage, 
-  SupportedLanguage 
+  ChatMessage 
 } from '../../types';
-import { TRANSLATIONS } from '../../i18n/translations';
 import { askAICounsellor } from '../../services/aiCounsellor';
 
 interface AICounsellorViewProps {
@@ -28,7 +23,6 @@ interface AICounsellorViewProps {
   savedCareerTitles: string[];
   chatHistory: ChatMessage[];
   onSaveChatHistory: (messages: ChatMessage[]) => void;
-  language: SupportedLanguage;
   initialQuery?: string;
 }
 
@@ -39,10 +33,8 @@ export const AICounsellorView: React.FC<AICounsellorViewProps> = ({
   savedCareerTitles,
   chatHistory,
   onSaveChatHistory,
-  language,
   initialQuery,
 }) => {
-  const t = TRANSLATIONS[language];
   const [messages, setMessages] = useState<ChatMessage[]>(chatHistory);
   const [inputQuery, setInputQuery] = useState(initialQuery || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -72,12 +64,14 @@ export const AICounsellorView: React.FC<AICounsellorViewProps> = ({
   // Initial welcome message if chat is empty
   useEffect(() => {
     if (messages.length === 0) {
+      const firstName = profile?.name ? profile.name.split(' ')[0] : 'there';
+      const dimensionsStr = (result?.topDimensions || []).map((d) => `${d}: ${result?.scores?.[d]?.interestScore ?? 50}%`).join(', ');
       const welcomeMsg: ChatMessage = {
         id: 'msg_welcome',
         sender: 'ai',
-        content: `Hello ${profile.name.split(' ')[0]}. I am your evidence-oriented career counsellor.
+        content: `Hello ${firstName}. I am your evidence-oriented career counsellor.
 
-I have full visibility into your ${result.hollandCode} Holland profile (${result.topDimensions.map((d) => `${d}: ${result.scores[d].interestScore}%`).join(', ')}), your measured gap in ${result.highestLatentDimension || 'your dimensions'}, and your recommended directions starting with ${topRec?.career.title}.
+I have full visibility into your ${result?.hollandCode || 'RIASEC'} Holland profile (${dimensionsStr}), your measured gap in ${result?.highestLatentDimension || 'your dimensions'}, and your recommended directions starting with ${topRec?.career.title || 'your top recommendations'}.
 
 What specific question or decision would you like to examine?`,
         timestamp: new Date().toISOString(),
@@ -156,25 +150,25 @@ What specific question or decision would you like to examine?`,
   };
 
   return (
-    <div className="w-full bg-zinc-950 text-zinc-100 min-h-screen pb-16 flex flex-col selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="w-full bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen pb-16 flex flex-col selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
       
       {/* Top Bar */}
-      <div className="border-b border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md sticky top-16 z-20">
+      <div className="border-b border-zinc-200 dark:border-zinc-900 bg-zinc-50/80 dark:bg-black/70 backdrop-blur-md sticky top-16 z-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-blue-950 border border-blue-800 flex items-center justify-center text-blue-400 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-white shadow-sm">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-heading text-sm font-bold text-zinc-100">
-                  {t.ai_title}
+                <h1 className="text-sm font-bold text-zinc-950 dark:text-white">
+                  AI Career Counsellor
                 </h1>
-                <span className="px-2 py-0.2 rounded-full bg-emerald-950 border border-emerald-800 text-[10px] font-mono text-emerald-400">
+                <span className="px-2 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-[10px] font-mono text-emerald-800 dark:text-emerald-400">
                   Evidence-Grounded
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-400 truncate max-w-sm sm:max-w-md">
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate max-w-sm sm:max-w-md">
                 Grounded in your {result.hollandCode} scores and Indian higher education routes.
               </p>
             </div>
@@ -182,7 +176,7 @@ What specific question or decision would you like to examine?`,
 
           <button
             onClick={handleClearHistory}
-            className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors text-xs font-mono flex items-center gap-1"
+            className="p-2 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors text-xs font-mono flex items-center gap-1 cursor-pointer"
             title="Clear Chat History"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -195,78 +189,71 @@ What specific question or decision would you like to examine?`,
       <div className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 overflow-y-auto">
         
         {/* Candidate Context Pill */}
-        <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-400">
+        <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400">
           <div className="flex items-center gap-2 truncate">
-            <span className="text-zinc-200">{profile.name}</span>
+            <span className="text-zinc-900 dark:text-zinc-200 font-semibold">{profile.name}</span>
             <span>·</span>
-            <span className="uppercase">{profile.segment.replace('_', ' ')}</span>
+            <span>{profile.segment.replace('_', ' ').toUpperCase()}</span>
             <span>·</span>
-            <span className="text-blue-400">{result.hollandCode}</span>
+            <span>Code: {result.hollandCode}</span>
           </div>
-          <span className="text-[10px] text-zinc-400 hidden sm:inline">
-            Active Context Loaded
-          </span>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500">Private session</span>
         </div>
 
-        {/* Message Stream */}
-        <div className="space-y-4">
-          {messages.map((msg, idx) => {
-            const isAI = msg.sender === 'ai';
+        {/* Messages List */}
+        <div className="space-y-6">
+          {messages.map((msg, index) => {
+            const isUser = msg.sender === 'user';
+
             return (
               <div
-                key={msg.id}
-                className={`flex gap-3 ${isAI ? 'justify-start' : 'justify-end'} group`}
+                key={msg.id || index}
+                className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                {isAI && (
-                  <div className="w-7 h-7 rounded-lg bg-blue-950 border border-blue-800 text-blue-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                )}
-
-                <div className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-4 text-xs leading-relaxed space-y-2 relative ${
-                  isAI
-                    ? 'bg-zinc-900 border border-zinc-800 text-zinc-200'
-                    : 'bg-blue-600 text-white rounded-br-none shadow-md'
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                  isUser 
+                    ? 'bg-black text-white dark:bg-white dark:text-black font-mono text-xs font-semibold' 
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700'
                 }`}>
-                  <div className="whitespace-pre-wrap">
+                  {isUser ? <UserIcon className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                </div>
+
+                <div className={`space-y-1.5 max-w-[85%] sm:max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
+                  <div className={`p-4 rounded-2xl text-xs leading-relaxed ${
+                    isUser
+                      ? 'bg-black text-white dark:bg-white dark:text-black rounded-tr-none shadow-sm font-medium'
+                      : 'bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-none space-y-2 whitespace-pre-line shadow-sm'
+                  }`}>
                     {msg.content}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 text-[10px] font-mono opacity-60">
-                    <span>
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-
-                    {isAI && (
+                  <div className={`flex items-center gap-2 px-1 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                    <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    {!isUser && (
                       <button
-                        onClick={() => handleCopyMessage(msg.content, idx)}
-                        className="opacity-0 group-hover:opacity-100 hover:text-white transition-opacity flex items-center gap-1"
-                        title="Copy text"
+                        onClick={() => handleCopyMessage(msg.content, index)}
+                        className="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Copy answer"
                       >
-                        {copiedIndex === idx ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                        <span>{copiedIndex === idx ? 'Copied' : 'Copy'}</span>
+                        {copiedIndex === index ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedIndex === index ? 'Copied' : 'Copy'}</span>
                       </button>
                     )}
                   </div>
                 </div>
-
-                {!isAI && (
-                  <div className="w-7 h-7 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 flex items-center justify-center shrink-0 mt-0.5 font-mono text-xs font-bold">
-                    {profile.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
               </div>
             );
           })}
 
+          {/* Loading Indicator */}
           {isLoading && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-7 h-7 rounded-lg bg-blue-950 border border-blue-800 text-blue-400 flex items-center justify-center shrink-0 animate-pulse">
-                <Sparkles className="w-4 h-4" />
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4" />
               </div>
-              <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-2xl flex items-center gap-2 text-xs text-zinc-400">
-                <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-                <span>Analyzing Holland scores and Indian pathway options...</span>
+              <div className="p-4 rounded-2xl rounded-tl-none bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-zinc-400 animate-pulse" />
+                <span>Evaluating Indian education & industry datasets...</span>
               </div>
             </div>
           )}
@@ -274,55 +261,58 @@ What specific question or decision would you like to examine?`,
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Suggested Starter Chips */}
+        {messages.length <= 2 && !isLoading && (
+          <div className="space-y-2 pt-2">
+            <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400">Suggested Questions:</span>
+            <div className="flex flex-wrap gap-2">
+              {starterChips.map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSendMessage(chip)}
+                  className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white transition-all text-left cursor-pointer"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* Bottom Fixed Input & Starter Chips */}
-      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-2 sticky bottom-4 z-20">
-        
-        {/* Starter Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {starterChips.map((chip, i) => (
-            <button
-              key={i}
-              onClick={() => handleSendMessage(chip)}
-              className="px-3 py-1.5 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-[11px] text-zinc-300 hover:text-white transition-colors whitespace-nowrap shadow-sm"
-            >
-              {chip}
-            </button>
-          ))}
-        </div>
-
-        {/* Input Bar */}
+      {/* Input Box Fixed at Bottom */}
+      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-2">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="relative flex items-center mt-1"
+          className="flex items-center gap-2 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 shadow-xl focus-within:border-zinc-500"
         >
           <input
             type="text"
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
-            placeholder={t.ai_placeholder}
+            placeholder="Ask about entrance exams, salary realities, syllabus, or transition steps..."
             disabled={isLoading}
-            className="w-full pl-4 pr-12 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-blue-500 shadow-2xl backdrop-blur-md"
+            className="flex-1 bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none disabled:opacity-50"
           />
 
           <button
             type="submit"
             disabled={!inputQuery.trim() || isLoading}
-            className={`absolute right-2 p-2 rounded-xl transition-all ${
-              inputQuery.trim() && !isLoading
-                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md'
-                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-            }`}
+            className="p-2.5 rounded-xl bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 disabled:opacity-30 disabled:hover:bg-black dark:disabled:hover:bg-white transition-all flex items-center justify-center cursor-pointer shadow-sm"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
 
+        <p className="text-[10px] text-zinc-400 dark:text-zinc-500 text-center mt-2 font-mono">
+          AI answers are grounded in the Holland RIASEC model & accredited Indian examination pathways.
+        </p>
       </div>
+
     </div>
   );
 };

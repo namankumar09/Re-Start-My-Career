@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
@@ -9,8 +11,21 @@
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  html.dark, html:not(.light) {
+    color-scheme: dark;
     background-color: #000000;
     color: #f4f4f5;
+  }
+
+  html.light {
+    color-scheme: light;
+    background-color: #ffffff;
+    color: #09090b;
   }
 
   h1, h2, h3, h4, .font-heading {
@@ -35,12 +50,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(120, 120, 120, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(120, 120, 120, 0.45);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -51,4 +66,3 @@
     scroll-behavior: auto !important;
   }
 }
-

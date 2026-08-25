@@ -4,18 +4,13 @@ import {
   Users, 
   Bookmark, 
   BookmarkCheck, 
-  Share2, 
   Printer, 
   Copy, 
   Check, 
   AlertTriangle, 
-  Calendar, 
-  GraduationCap, 
   ChevronDown, 
   ChevronUp, 
   Sparkles, 
-  ArrowRight, 
-  CheckCircle2, 
   ExternalLink,
   Shield,
   HelpCircle,
@@ -25,11 +20,8 @@ import {
   AssessmentResult, 
   UserProfile, 
   Recommendation, 
-  Opportunity, 
-  SupportedLanguage, 
   RIASECDimension 
 } from '../../types';
-import { TRANSLATIONS } from '../../i18n/translations';
 import { HexagonSVG } from '../common/HexagonSVG';
 import { SCHOLARSHIPS_DATA } from '../../data/scholarships';
 
@@ -41,7 +33,6 @@ interface ReportViewProps {
   onToggleSaveCareer: (career: Recommendation) => void;
   onOpenAICounsellor: () => void;
   onRetakeAssessment: () => void;
-  language: SupportedLanguage;
 }
 
 export const ReportView: React.FC<ReportViewProps> = ({
@@ -52,19 +43,17 @@ export const ReportView: React.FC<ReportViewProps> = ({
   onToggleSaveCareer,
   onOpenAICounsellor,
   onRetakeAssessment,
-  language,
 }) => {
-  const t = TRANSLATIONS[language];
   const [audienceMode, setAudienceMode] = useState<'for_you' | 'for_parents'>('for_you');
   const [expandedRecId, setExpandedRecId] = useState<string | null>(recommendations[0]?.career.id || null);
   const [copiedParentReport, setCopiedParentReport] = useState(false);
   const [selectedHexDimension, setSelectedHexDimension] = useState<RIASECDimension | null>(null);
 
   // Highest latent or top primary dimension
-  const primaryDim = result.topDimensions[0];
-  const primaryScore = result.scores[primaryDim];
-  const latentDim = result.highestLatentDimension;
-  const latentScore = latentDim ? result.scores[latentDim] : null;
+  const primaryDim = result?.topDimensions?.[0] || 'Investigative';
+  const primaryScore = result?.scores?.[primaryDim] || { interestScore: 75, confidenceScore: 70, gap: 5, classification: 'Aligned' as const };
+  const latentDim = result?.highestLatentDimension;
+  const latentScore = latentDim && result?.scores ? result.scores[latentDim] : null;
 
   // Filter scholarships based on user optional category/income
   const matchedOpportunities = SCHOLARSHIPS_DATA.filter((opp) => {
@@ -95,48 +84,48 @@ export const ReportView: React.FC<ReportViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-zinc-950 text-zinc-100 min-h-screen pb-24 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="w-full bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen pb-24 selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
       
-      {/* Top Header & Audience Toggle (Apple-style spacious top bar) */}
-      <div className="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md sticky top-16 z-30">
+      {/* Top Header & Audience Toggle */}
+      <div className="border-b border-zinc-200 dark:border-zinc-900 bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-16 z-30 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+            <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
               <span>{profile.name}</span>
               <span>·</span>
               <span className="uppercase">{profile.segment.replace('_', ' ')}</span>
               <span>·</span>
-              <span>Code: <strong className="text-blue-400 font-mono">{result.hollandCode}</strong></span>
+              <span>Code: <strong className="text-zinc-900 dark:text-white font-mono">{result.hollandCode}</strong></span>
             </div>
-            <h1 className="font-heading text-lg font-bold text-zinc-100 tracking-tight">
-              {audienceMode === 'for_you' ? t.report_title_user : t.parent_report_title}
+            <h1 className="text-lg font-bold text-zinc-950 dark:text-white tracking-tight">
+              {audienceMode === 'for_you' ? 'Candidate Psychometric Intelligence Report' : 'Family Summary Report'}
             </h1>
           </div>
 
           {/* Audience Toggle (For you vs For your parents) */}
-          <div className="inline-flex p-1 rounded-full bg-zinc-900 border border-zinc-800 shadow-inner">
+          <div className="inline-flex p-1 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-inner">
             <button
               onClick={() => setAudienceMode('for_you')}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-tight transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-tight transition-all flex items-center gap-1.5 cursor-pointer ${
                 audienceMode === 'for_you'
-                  ? 'bg-blue-600 text-white font-semibold shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-black text-white dark:bg-white dark:text-black font-semibold shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>{t.tab_for_you}</span>
+              <span>For You</span>
             </button>
 
             <button
               onClick={() => setAudienceMode('for_parents')}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-tight transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-tight transition-all flex items-center gap-1.5 cursor-pointer ${
                 audienceMode === 'for_parents'
                   ? 'bg-emerald-600 text-white font-semibold shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>{t.tab_for_parents}</span>
+              <span>For Your Parents</span>
             </button>
           </div>
         </div>
@@ -150,27 +139,27 @@ export const ReportView: React.FC<ReportViewProps> = ({
         {audienceMode === 'for_you' && (
           <div className="space-y-16 animate-in fade-in duration-200">
             
-            {/* 1. HEADLINE (Large Apple typography) */}
+            {/* 1. HEADLINE */}
             <div className="space-y-3 pt-4">
-              <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
                 01 · Core Directional Signal
               </span>
-              <h2 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 leading-tight">
+              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-950 dark:text-white leading-tight">
                 “{result.headline}”
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl font-normal leading-relaxed">
-                Derived from your 24 response signals across 6 RIASEC archetypes. Primary alignment: <strong className="text-zinc-200">{result.topDimensions.join(' · ')}</strong>.
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
+                Derived from your 24 response signals across 6 RIASEC archetypes. Primary alignment: <strong className="text-zinc-900 dark:text-zinc-200">{result.topDimensions.join(' · ')}</strong>.
               </p>
             </div>
 
             {/* 2. FULL-WIDTH GAP PANEL */}
-            <div className="rounded-3xl bg-zinc-900 border border-zinc-800 p-6 sm:p-10 space-y-6 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-4">
+            <div className="rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 sm:p-10 space-y-6 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-4">
                 <div>
-                  <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                    {t.gap_panel_title}
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Gap Analysis (Interest vs Confidence)
                   </span>
-                  <h3 className="font-heading text-xl font-bold text-zinc-100">
+                  <h3 className="text-xl font-bold text-zinc-950 dark:text-white">
                     {latentScore && latentScore.gap > 20
                       ? `Latent Signal in ${latentDim}`
                       : `Calibrated Harmony across ${primaryDim}`}
@@ -180,48 +169,48 @@ export const ReportView: React.FC<ReportViewProps> = ({
                 <div className="flex items-center gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-mono font-medium ${
                     latentScore && latentScore.gap > 20
-                      ? 'bg-amber-950/60 border border-amber-800/80 text-amber-300'
-                      : 'bg-emerald-950/60 border border-emerald-800/80 text-emerald-300'
+                      ? 'bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800/80 text-amber-800 dark:text-amber-300'
+                      : 'bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300'
                   }`}>
-                    {latentScore && latentScore.gap > 20 ? t.latent_badge : t.aligned_badge}
+                    {latentScore && latentScore.gap > 20 ? 'Latent Interest Detected' : 'Interest & Confidence Aligned'}
                   </span>
                 </div>
               </div>
 
               {/* Numerical Metrics Triple Bar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-                  <span className="text-xs font-mono text-zinc-400">Interest (Pull)</span>
-                  <div className="text-3xl font-mono font-bold text-blue-400 mt-1">
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">Interest (Pull)</span>
+                  <div className="text-3xl font-mono font-bold text-zinc-950 dark:text-white mt-1">
                     {latentScore ? latentScore.interestScore : primaryScore?.interestScore || 85}%
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1">Intrinsic curiosity and focus</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Intrinsic curiosity and focus</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-                  <span className="text-xs font-mono text-zinc-400">Confidence (Self-Belief)</span>
-                  <div className="text-3xl font-mono font-bold text-emerald-400 mt-1">
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">Confidence (Self-Belief)</span>
+                  <div className="text-3xl font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                     {latentScore ? latentScore.confidenceScore : primaryScore?.confidenceScore || 80}%
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1">Current perceived execution readiness</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Current perceived execution readiness</p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-                  <span className="text-xs font-mono text-zinc-400">Measured Gap</span>
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">Measured Gap</span>
                   <div className={`text-3xl font-mono font-bold mt-1 ${
-                    (latentScore?.gap || 0) > 20 ? 'text-amber-400' : 'text-zinc-200'
+                    (latentScore?.gap || 0) > 20 ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-700 dark:text-zinc-200'
                   }`}>
                     {(latentScore?.gap || 0) > 0 ? `+${latentScore?.gap}` : latentScore?.gap || '+5'}
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1">Interest score minus confidence score</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Interest score minus confidence score</p>
                 </div>
               </div>
 
               {/* Calibrated Interpretation Narrative */}
-              <div className="p-5 rounded-2xl bg-zinc-950 border border-zinc-800/90 text-xs text-zinc-300 leading-relaxed">
+              <div className="p-5 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/90 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
                 {latentScore && latentScore.gap > 20 ? (
                   <p>
-                    You are pulled toward <strong className="text-amber-300 font-semibold">{latentDim}</strong> work far harder than you believe you are capable of it (Interest: {latentScore.interestScore} vs Confidence: {latentScore.confidenceScore}, Gap: +{latentScore.gap}). That gap is almost never about natural cognitive ability — it is about never having been encouraged in that direction. This is the direction most likely to be quietly abandoned, and the one worth testing first with low-risk micro-experiments.
+                    You are pulled toward <strong className="text-amber-700 dark:text-amber-300 font-semibold">{latentDim}</strong> work far harder than you believe you are capable of it (Interest: {latentScore.interestScore} vs Confidence: {latentScore.confidenceScore}, Gap: +{latentScore.gap}). That gap is almost never about natural cognitive ability — it is about never having been encouraged in that direction. This is the direction most likely to be quietly abandoned, and the one worth testing first with low-risk micro-experiments.
                   </p>
                 ) : (
                   <p>
@@ -232,7 +221,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
             </div>
 
             {/* 3. HOLLAND RIASEC PROFILE & HEXAGON */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/80">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80">
               <div className="lg:col-span-6 flex justify-center">
                 <HexagonSVG 
                   scores={result.scores} 
@@ -245,10 +234,10 @@ export const ReportView: React.FC<ReportViewProps> = ({
 
               <div className="lg:col-span-6 space-y-4">
                 <div className="space-y-1">
-                  <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
                     03 · Holland Code {result.hollandCode}
                   </span>
-                  <h3 className="font-heading text-2xl font-bold text-zinc-100">
+                  <h3 className="text-2xl font-bold text-zinc-950 dark:text-white">
                     Dimensional Breakdown
                   </h3>
                 </div>
@@ -262,19 +251,19 @@ export const ReportView: React.FC<ReportViewProps> = ({
                         onClick={() => setSelectedHexDimension(dim)}
                         className={`p-3 rounded-xl border transition-all cursor-pointer ${
                           selectedHexDimension === dim 
-                            ? 'bg-zinc-800 border-blue-500' 
-                            : 'bg-zinc-950/80 border-zinc-800 hover:border-zinc-700'
+                            ? 'bg-zinc-200 dark:bg-zinc-800 border-black dark:border-white shadow-sm' 
+                            : 'bg-white dark:bg-zinc-950/80 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
                         }`}
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-zinc-200">
+                          <span className="font-semibold text-zinc-900 dark:text-zinc-200">
                             {idx + 1}. {dim}
                           </span>
-                          <span className="font-mono text-zinc-400 text-[11px]">
-                            Interest: <span className="text-blue-400">{score.interestScore}%</span> · Confidence: <span className="text-emerald-400">{score.confidenceScore}%</span>
+                          <span className="font-mono text-zinc-500 dark:text-zinc-400 text-[11px]">
+                            Interest: <span className="text-zinc-900 dark:text-white font-semibold">{score.interestScore}%</span> · Confidence: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{score.confidenceScore}%</span>
                           </span>
                         </div>
-                        <p className="text-[11px] text-zinc-400 mt-1">
+                        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1">
                           {getDimensionSummary(dim)}
                         </p>
                       </div>
@@ -282,7 +271,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
                   })}
                 </div>
 
-                <p className="text-[11px] text-zinc-400 pt-2 font-mono">
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pt-2 font-mono">
                   Tip: Click any dimension on the hexagon or list above to inspect specific alignment.
                 </p>
               </div>
@@ -292,20 +281,20 @@ export const ReportView: React.FC<ReportViewProps> = ({
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
                     04 · Pathways Mapped
                   </span>
-                  <h3 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100 mt-1">
-                    {t.recommendations_heading}
+                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white mt-1">
+                    Ranked Career Pathways
                   </h3>
                 </div>
-                <span className="text-xs font-mono text-zinc-400">
+                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
                   {recommendations.length} Verified Indian Routes
                 </span>
               </div>
 
               <div className="space-y-4">
-                {recommendations.map((rec, index) => {
+                {recommendations.map((rec) => {
                   const isExpanded = expandedRecId === rec.career.id;
                   const isSaved = savedCareerIds.includes(rec.career.id);
 
@@ -314,8 +303,8 @@ export const ReportView: React.FC<ReportViewProps> = ({
                       key={rec.career.id}
                       className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
                         isExpanded
-                          ? 'bg-zinc-900 border-zinc-700 shadow-2xl'
-                          : 'bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700'
+                          ? 'bg-zinc-50 dark:bg-zinc-900 border-zinc-400 dark:border-zinc-700 shadow-xl'
+                          : 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800/80 hover:border-zinc-400 dark:hover:border-zinc-700'
                       }`}
                     >
                       {/* Card Header */}
@@ -325,29 +314,28 @@ export const ReportView: React.FC<ReportViewProps> = ({
                       >
                         <div className="space-y-1.5 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-full bg-blue-950 border border-blue-800 text-blue-300 text-xs font-mono font-bold">
+                            <span className="px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs font-mono font-bold">
                               {rec.fitScore}% FIT
                             </span>
                             {rec.transitionLabel && (
-                              <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 text-[10px] font-mono">
+                              <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] font-mono border border-zinc-200 dark:border-zinc-700">
                                 {rec.transitionLabel}
                               </span>
                             )}
                             {rec.career.isPcbMedical && (
-                              <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 text-[10px] font-mono">
+                              <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-mono">
                                 Medical / PCB Track
                               </span>
                             )}
                           </div>
                           
-                          <h4 className="font-heading text-xl font-bold text-zinc-100">
+                          <h4 className="text-xl font-bold text-zinc-950 dark:text-white">
                             {rec.career.title}
                           </h4>
 
-                          {/* Reasoning Chain (Visible before explanation) */}
-                          <p className="text-xs font-mono text-zinc-400">
-                            <span className="text-zinc-400">Reasoning Chain:</span>{' '}
-                            <span className="text-blue-300 font-semibold">{rec.reasoningChain}</span>
+                          <p className="text-xs font-mono text-zinc-600 dark:text-zinc-400">
+                            <span>Reasoning Chain:</span>{' '}
+                            <span className="text-zinc-900 dark:text-zinc-200 font-semibold">{rec.reasoningChain}</span>
                           </p>
                         </div>
 
@@ -358,18 +346,18 @@ export const ReportView: React.FC<ReportViewProps> = ({
                               e.stopPropagation();
                               onToggleSaveCareer(rec);
                             }}
-                            className={`p-2.5 rounded-full border text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                            className={`p-2.5 rounded-full border text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
                               isSaved
-                                ? 'bg-blue-950 border-blue-500 text-blue-300'
-                                : 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:text-white'
+                                ? 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white'
+                                : 'bg-zinc-100 dark:bg-zinc-800/80 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-black dark:hover:text-white'
                             }`}
                             title={isSaved ? 'Remove from saved' : 'Save career'}
                           >
                             {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                            <span className="hidden sm:inline">{isSaved ? t.btn_saved : t.btn_save_career}</span>
+                            <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save Career'}</span>
                           </button>
 
-                          <div className="text-zinc-400 p-1">
+                          <div className="text-zinc-500 dark:text-zinc-400 p-1">
                             {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                           </div>
                         </div>
@@ -377,64 +365,64 @@ export const ReportView: React.FC<ReportViewProps> = ({
 
                       {/* Expandable Body */}
                       {isExpanded && (
-                        <div className="px-6 pb-6 pt-2 border-t border-zinc-800/60 space-y-6 text-xs text-zinc-300">
+                        <div className="px-6 pb-6 pt-2 border-t border-zinc-200 dark:border-zinc-800/60 space-y-6 text-xs text-zinc-700 dark:text-zinc-300">
                           
                           {/* Why this */}
                           <div>
-                            <h5 className="font-mono text-[11px] text-blue-400 uppercase tracking-wider mb-1">
+                            <h5 className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-1">
                               Why This Direction
                             </h5>
-                            <p className="text-zinc-300 leading-relaxed">
+                            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
                               {rec.whyThis}
                             </p>
                           </div>
 
                           {/* How you get there */}
                           <div>
-                            <h5 className="font-mono text-[11px] text-emerald-400 uppercase tracking-wider mb-1">
+                            <h5 className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
                               How You Get There (Indian Pathway)
                             </h5>
-                            <p className="text-zinc-200 font-mono text-[11px] bg-zinc-950 p-3 rounded-xl border border-zinc-800 leading-relaxed">
+                            <p className="text-zinc-900 dark:text-zinc-200 font-mono text-[11px] bg-white dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 leading-relaxed">
                               {rec.howYouGetThere}
                             </p>
                           </div>
 
                           {/* What it is actually like */}
                           <div>
-                            <h5 className="font-mono text-[11px] text-amber-400 uppercase tracking-wider mb-1">
+                            <h5 className="font-mono text-[11px] text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">
                               What It Is Actually Like (Day-to-Day Reality ~5 Years In)
                             </h5>
-                            <p className="text-zinc-300 leading-relaxed italic bg-zinc-950/40 p-3 rounded-xl border border-zinc-800/60">
+                            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed italic bg-zinc-100/60 dark:bg-zinc-950/40 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/60">
                               “{rec.whatItIsActuallyLike}”
                             </p>
                           </div>
 
                           {/* Details Grid: Exams, Institutions, Duration, Comp */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-                            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
-                              <span className="text-[10px] font-mono text-zinc-400 uppercase">Key Indian Exams</span>
-                              <p className="text-xs font-semibold text-zinc-200 mt-1">
+                            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                              <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase">Key Indian Exams</span>
+                              <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 mt-1">
                                 {rec.indianExams.join(', ') || 'Merit / Portfolio'}
                               </p>
                             </div>
 
-                            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
-                              <span className="text-[10px] font-mono text-zinc-400 uppercase">Premier Institutions</span>
-                              <p className="text-xs font-semibold text-zinc-200 mt-1 line-clamp-2">
+                            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                              <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase">Premier Institutions</span>
+                              <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 mt-1 line-clamp-2">
                                 {rec.institutions.slice(0, 3).join(', ')}
                               </p>
                             </div>
 
-                            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
-                              <span className="text-[10px] font-mono text-zinc-400 uppercase">Time to Entry</span>
-                              <p className="text-xs font-semibold text-zinc-200 mt-1">
+                            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                              <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase">Time to Entry</span>
+                              <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 mt-1">
                                 {rec.estimatedDuration}
                               </p>
                             </div>
 
-                            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
-                              <span className="text-[10px] font-mono text-zinc-400 uppercase">Est. Income Range</span>
-                              <p className="text-xs font-semibold text-blue-300 mt-1">
+                            <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                              <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase">Est. Income Range</span>
+                              <p className="text-xs font-semibold text-zinc-950 dark:text-zinc-100 mt-1">
                                 {rec.career.incomeRange}
                               </p>
                             </div>
@@ -451,22 +439,22 @@ export const ReportView: React.FC<ReportViewProps> = ({
             {/* 5. WATCH-OUTS & REALITIES */}
             <div className="space-y-4 pt-4">
               <div>
-                <span className="text-xs font-mono text-red-400 uppercase tracking-widest">
+                <span className="text-xs font-mono text-red-600 dark:text-red-400 uppercase tracking-widest">
                   05 · Candid Realities
                 </span>
-                <h3 className="font-heading text-2xl font-bold tracking-tight text-zinc-100 mt-1">
-                  {t.watchouts_heading}
+                <h3 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-1">
+                  Watch-Outs & Trade-Offs
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {watchouts.map((w, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 space-y-2">
-                    <div className="flex items-center gap-2 text-xs font-mono text-red-300">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                  <div key={idx} className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-mono text-red-600 dark:text-red-300">
+                      <AlertTriangle className="w-3.5 h-3.5 text-red-500 dark:text-red-400 shrink-0" />
                       <span className="font-semibold">{w.title}</span>
                     </div>
-                    <p className="text-xs text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                       {w.description}
                     </p>
                   </div>
@@ -477,24 +465,24 @@ export const ReportView: React.FC<ReportViewProps> = ({
             {/* 6. NEXT 30 DAYS ACTION PLAN */}
             <div className="space-y-6 pt-4">
               <div>
-                <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
+                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
                   06 · Actionable Execution
                 </span>
-                <h3 className="font-heading text-2xl font-bold tracking-tight text-zinc-100 mt-1">
-                  {t.thirty_days_heading}
+                <h3 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-1">
+                  Next 30 Days Action Plan
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {actionPlan.map((step) => (
-                  <div key={step.week} className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-2">
+                  <div key={step.week} className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-2 shadow-sm">
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+                      <span className="px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700">
                         {step.week}
                       </span>
-                      <span className="text-zinc-400">{step.title}</span>
+                      <span className="text-zinc-500 dark:text-zinc-400">{step.title}</span>
                     </div>
-                    <p className="text-xs text-zinc-300 leading-relaxed pt-1">
+                    <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
                       {step.action}
                     </p>
                   </div>
@@ -507,32 +495,32 @@ export const ReportView: React.FC<ReportViewProps> = ({
               <div className="space-y-6 pt-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-mono text-emerald-400 uppercase tracking-widest">
+                    <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                       07 · Financial Support
                     </span>
-                    <h3 className="font-heading text-2xl font-bold tracking-tight text-zinc-100 mt-1">
-                      {t.opportunities_heading}
+                    <h3 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-1">
+                      Matched Scholarships & Schemes
                     </h3>
                   </div>
-                  <span className="text-xs font-mono text-zinc-400">
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
                     Indian Central & State Schemes
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {matchedOpportunities.map((opp) => (
-                    <div key={opp.id} className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex flex-col justify-between space-y-4">
+                    <div key={opp.id} className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between space-y-4 shadow-sm">
                       <div className="space-y-2">
-                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
+                        <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/40">
                           {opp.provider}
                         </span>
-                        <h4 className="text-xs font-bold text-zinc-100">
+                        <h4 className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
                           {opp.title}
                         </h4>
-                        <p className="text-[11px] text-zinc-400 leading-relaxed">
+                        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
                           {opp.description}
                         </p>
-                        <p className="text-xs text-emerald-300 font-mono font-medium pt-1">
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300 font-mono font-medium pt-1">
                           {opp.coverage}
                         </p>
                       </div>
@@ -541,7 +529,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
                         href={opp.applicationLink}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center justify-between text-xs font-mono text-zinc-300 hover:text-white pt-3 border-t border-zinc-800"
+                        className="inline-flex items-center justify-between text-xs font-mono text-zinc-600 dark:text-zinc-300 hover:text-black dark:hover:text-white pt-3 border-t border-zinc-200 dark:border-zinc-800 cursor-pointer"
                       >
                         <span>Official Portal</span>
                         <ExternalLink className="w-3 h-3" />
@@ -553,12 +541,12 @@ export const ReportView: React.FC<ReportViewProps> = ({
             )}
 
             {/* Bottom Actions Banner */}
-            <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+            <div className="p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
               <div className="space-y-1 text-center sm:text-left">
-                <h4 className="font-heading text-lg font-bold text-zinc-100">
+                <h4 className="text-lg font-bold text-zinc-950 dark:text-white">
                   Have specific questions about this roadmap?
                 </h4>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">
                   Consult the AI Career Counsellor referencing your exact scores and Indian pathway constraints.
                 </p>
               </div>
@@ -566,7 +554,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
               <div className="flex items-center gap-3">
                 <button
                   onClick={onRetakeAssessment}
-                  className="px-4 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-full bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Retake</span>
@@ -574,9 +562,9 @@ export const ReportView: React.FC<ReportViewProps> = ({
 
                 <button
                   onClick={onOpenAICounsellor}
-                  className="px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 text-xs font-semibold tracking-tight transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                  <Sparkles className="w-3.5 h-3.5" />
                   <span>Open AI Counsellor</span>
                 </button>
               </div>
@@ -592,63 +580,63 @@ export const ReportView: React.FC<ReportViewProps> = ({
           <div className="space-y-12 animate-in fade-in duration-200">
             
             {/* Parent Header */}
-            <div className="p-8 rounded-3xl bg-emerald-950/20 border border-emerald-900/40 space-y-4">
+            <div className="p-8 rounded-3xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-800 text-emerald-300 text-xs font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-mono font-medium">
                   Parent & Family Briefing
                 </span>
                 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleCopyParentReport}
-                    className="px-3 py-1.5 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    {copiedParentReport ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                    <span>{copiedParentReport ? 'Copied' : t.btn_copy}</span>
+                    {copiedParentReport ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedParentReport ? 'Copied' : 'Copy'}</span>
                   </button>
 
                   <button
                     onClick={handlePrint}
-                    className="px-3 py-1.5 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition-colors"
+                    className="px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Printer className="w-3 h-3" />
-                    <span>{t.btn_print}</span>
+                    <span>Print</span>
                   </button>
                 </div>
               </div>
 
-              <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
                 Career Direction Summary for {profile.name}
               </h2>
-              <p className="text-xs text-zinc-300 leading-relaxed max-w-3xl">
+              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed max-w-3xl">
                 This document is specifically structured to support constructive family discussion. It translates {profile.name}’s core strengths into recognized professional competencies, outlines established educational institutions and degree pathways, and highlights career stability.
               </p>
             </div>
 
-            {/* Core Competencies (Framed around stability & reliability) */}
-            <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-6">
-              <h3 className="font-heading text-xl font-bold text-zinc-100">
+            {/* Core Competencies */}
+            <div className="p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-6">
+              <h3 className="text-xl font-bold text-zinc-950 dark:text-white">
                 Observed Core Strengths & Work Style
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-1.5">
-                  <span className="text-xs font-mono text-emerald-400 font-semibold">Reliability & Discipline</span>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1.5">
+                  <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-semibold">Reliability & Discipline</span>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     Demonstrates sustained intellectual stamina for structured problem-solving, attention to detail, and methodical execution.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-1.5">
-                  <span className="text-xs font-mono text-emerald-400 font-semibold">Analytical Capability</span>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1.5">
+                  <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-semibold">Analytical Capability</span>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     High natural affinity for first-principles reasoning, empirical evidence, and diagnostic troubleshooting.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-1.5">
-                  <span className="text-xs font-mono text-emerald-400 font-semibold">Professional Adaptability</span>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                <div className="p-4 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 space-y-1.5">
+                  <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-semibold">Professional Adaptability</span>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     Strong capability to master modern computational tools, regulatory frameworks, and specialized domain knowledge.
                   </p>
                 </div>
@@ -657,30 +645,30 @@ export const ReportView: React.FC<ReportViewProps> = ({
 
             {/* Recommended Established Pathways */}
             <div className="space-y-4">
-              <h3 className="font-heading text-xl font-bold text-zinc-100">
+              <h3 className="text-xl font-bold text-zinc-950 dark:text-white">
                 Established Educational Routes & Employability Outlook
               </h3>
 
               <div className="space-y-4">
                 {recommendations.slice(0, 3).map((rec, idx) => (
-                  <div key={rec.career.id} className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-3">
+                  <div key={rec.career.id} className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-heading text-base font-bold text-zinc-100">
+                      <h4 className="text-base font-bold text-zinc-950 dark:text-white">
                         {idx + 1}. {rec.career.title}
                       </h4>
-                      <span className="text-xs font-mono text-emerald-400">
+                      <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 font-medium">
                         {rec.career.incomeRange}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-300">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-700 dark:text-zinc-300">
                       <div>
-                        <span className="font-mono text-[10px] text-zinc-400 uppercase">Degree & Entrance Route:</span>
-                        <p className="text-zinc-200 mt-0.5">{rec.howYouGetThere}</p>
+                        <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 uppercase">Degree & Entrance Route:</span>
+                        <p className="text-zinc-900 dark:text-zinc-200 mt-0.5">{rec.howYouGetThere}</p>
                       </div>
                       <div>
-                        <span className="font-mono text-[10px] text-zinc-400 uppercase">Recognized Institutions:</span>
-                        <p className="text-zinc-200 mt-0.5">{rec.institutions.slice(0, 3).join(', ')}</p>
+                        <span className="font-mono text-[10px] text-zinc-500 dark:text-zinc-400 uppercase">Recognized Institutions:</span>
+                        <p className="text-zinc-900 dark:text-zinc-200 mt-0.5">{rec.institutions.slice(0, 3).join(', ')}</p>
                       </div>
                     </div>
                   </div>
@@ -689,38 +677,38 @@ export const ReportView: React.FC<ReportViewProps> = ({
             </div>
 
             {/* What was left out of this version, and why */}
-            <div className="p-8 rounded-3xl bg-zinc-900/60 border border-zinc-800 space-y-4">
+            <div className="p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 space-y-4">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-400" />
-                <h3 className="font-heading text-lg font-bold text-zinc-100">
-                  {t.parent_rationale_heading}
+                <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-lg font-bold text-zinc-950 dark:text-white">
+                  Why this parent briefing is structured differently
                 </h3>
               </div>
 
-              <div className="space-y-3 text-xs text-zinc-400 leading-relaxed">
+              <div className="space-y-3 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                 <p>
-                  • <strong className="text-zinc-200">Raw Numerical Scores were removed:</strong> Numerical test scores frequently invite unproductive debates about whether the assessment is "100% scientifically absolute" rather than encouraging constructive family planning about real educational options.
+                  • <strong className="text-zinc-900 dark:text-zinc-200">Raw Numerical Scores were removed:</strong> Numerical test scores frequently invite unproductive debates about whether the assessment is "100% scientifically absolute" rather than encouraging constructive family planning about real educational options.
                 </p>
                 <p>
-                  • <strong className="text-zinc-200">Watch-Outs were removed:</strong> Candid self-reflective cautions can easily be misinterpreted as personal weakness or incapacity, whereas their true purpose is self-awareness and tactical risk mitigation.
+                  • <strong className="text-zinc-900 dark:text-zinc-200">Watch-Outs were removed:</strong> Candid self-reflective cautions can easily be misinterpreted as personal weakness or incapacity, whereas their true purpose is self-awareness and tactical risk mitigation.
                 </p>
                 <p>
-                  • <strong className="text-zinc-200">Structured Around Accredited Routes:</strong> The pathways shown here focus on accredited Indian entrance examinations, state/central universities, and proven corporate/public sector employment routes.
+                  • <strong className="text-zinc-900 dark:text-zinc-200">Structured Around Accredited Routes:</strong> The pathways shown here focus on accredited Indian entrance examinations, state/central universities, and proven corporate/public sector employment routes.
                 </p>
               </div>
             </div>
 
             {/* One Small Ask */}
-            <div className="p-8 rounded-3xl bg-zinc-900 border border-emerald-900/60 space-y-4">
-              <div className="flex items-center gap-2 text-emerald-400">
+            <div className="p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900 border border-emerald-300 dark:border-emerald-900/60 space-y-4">
+              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
                 <HelpCircle className="w-4 h-4" />
-                <h3 className="font-heading text-lg font-bold text-zinc-100">
-                  {t.parent_ask_heading}
+                <h3 className="text-lg font-bold text-zinc-950 dark:text-white">
+                  One Small Ask for Parents
                 </h3>
               </div>
 
-              <p className="text-xs text-zinc-300 leading-relaxed bg-zinc-950 p-4 rounded-xl border border-zinc-800">
-                “Give {profile.name} <strong className="text-emerald-300">one month</strong> to research these specific pathways properly, talk to at least two professionals working in these fields, and prepare an evidence-based roadmap before deciding that any direction is unrealistic.”
+              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed bg-white dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                “Give {profile.name} <strong className="text-emerald-700 dark:text-emerald-300">one month</strong> to research these specific pathways properly, talk to at least two professionals working in these fields, and prepare an evidence-based roadmap before deciding that any direction is unrealistic.”
               </p>
             </div>
 
@@ -807,7 +795,7 @@ function generateParentReportText(
   profile: UserProfile,
   recommendations: Recommendation[]
 ): string {
-  return `re\\start my career — Family Career Direction Summary
+  return `PathFind — Family Career Direction Summary
 Student: ${profile.name} (${profile.age} years old)
 Stage: ${profile.segment.replace('_', ' ').toUpperCase()}
 Holland RIASEC Profile: ${result.hollandCode} (${result.topDimensions.join(', ')})

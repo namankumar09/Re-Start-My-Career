@@ -1,15 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Re\Start My Career — Direction & Pathways</title>
+    <meta name="theme-color" content="#000000" />
+    <title>PathFind (Re\Start My Career) — Direction & Pathways</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="description" content="Find the direction you are drawn to. Then find the path to actually get there." />
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('restart_theme') || 'dark';
+          const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            document.documentElement.style.colorScheme = 'light';
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', '#ffffff');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-black text-zinc-100 antialiased selection:bg-zinc-800 selection:text-white">
+  <body class="bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 antialiased selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

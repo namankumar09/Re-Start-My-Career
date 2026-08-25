@@ -9,7 +9,6 @@ import {
   NotificationSettings, 
   AISettings, 
   ThemeMode, 
-  SupportedLanguage, 
   Segment,
   AuthUser 
 } from './types';
@@ -35,6 +34,8 @@ import { DemoAccount } from './data/demoProfiles';
 export default function App() {
   // Authentication State
   const [authUser, setAuthUser] = useState<AuthUser | null>(() => AuthService.getCurrentUser());
+  const [authInitialMode, setAuthInitialMode] = useState<'signup' | 'signin'>('signup');
+  const [pendingAssessmentIntent, setPendingAssessmentIntent] = useState<boolean>(false);
 
   // Global App State with LocalStorage Persistence
   const [profile, setProfile] = useState<UserProfile | null>(() => StorageService.getProfile());
@@ -57,7 +58,6 @@ export default function App() {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>(() => StorageService.getNotificationSettings());
   const [aiSettings, setAiSettings] = useState<AISettings>(() => StorageService.getAISettings());
   const [theme, setTheme] = useState<ThemeMode>(() => StorageService.getTheme());
-  const [language, setLanguage] = useState<SupportedLanguage>(() => StorageService.getLanguage());
 
   // Navigation State
   const [activeTab, setActiveTab] = useState<string>(() => {
@@ -76,18 +76,33 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Sync theme
+  // Sync theme to Storage and HTML class
   useEffect(() => {
     StorageService.saveTheme(theme);
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
   }, [theme]);
 
-  // Handle Starting Assessment from Landing
+  // Handle Starting Assessment from Landing / CTA
   const handleStartAssessment = (targetSegment?: Segment) => {
     setOnboardingInitialSegment(targetSegment);
-    if (!profile || targetSegment) {
-      setActiveTab('onboarding');
+
+    if (!authUser) {
+      setPendingAssessmentIntent(true);
+      setAuthInitialMode('signup');
+      setActiveTab('auth');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setActiveTab('assessment');
+      if (!profile || targetSegment) {
+        setActiveTab('onboarding');
+      } else {
+        setActiveTab('assessment');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -101,6 +116,7 @@ export default function App() {
     StorageService.saveAnswers({});
     StorageService.saveAssessmentIndex(0);
     setActiveTab('assessment');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Save Progress during Assessment
@@ -138,10 +154,23 @@ export default function App() {
     StorageService.saveNotifications(updatedNotifs);
 
     setActiveTab('report');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Load a 1-Click Evaluation Demo Persona
   const handleSelectDemoProfile = (demo: DemoAccount) => {
+    // Create demo user session
+    const demoUser: AuthUser = {
+      uid: demo.profile.id,
+      displayName: demo.profile.name,
+      email: demo.profile.email || 'demo@pathfind.app',
+      provider: 'password',
+      createdAt: demo.profile.createdAt,
+      lastLoginAt: new Date().toISOString(),
+    };
+    AuthService.saveUser(demoUser);
+    setAuthUser(demoUser);
+
     setProfile(demo.profile);
     StorageService.saveProfile(demo.profile);
 
@@ -170,20 +199,25 @@ export default function App() {
     }
 
     setActiveTab('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle Authentication Success
+  // Handle Authentication Success (Sign In / Sign Up)
   const handleAuthSuccess = (user: AuthUser) => {
     setAuthUser(user);
     const existing = StorageService.getProfile();
-    const synced = AuthService.syncProfileWithAuth(user, existing?.segment);
+    const synced = AuthService.syncProfileWithAuth(user, existing?.segment || onboardingInitialSegment);
     setProfile(synced);
 
-    if (result) {
+    if (pendingAssessmentIntent || !result) {
+      setPendingAssessmentIntent(false);
+      setActiveTab('onboarding');
+    } else if (result) {
       setActiveTab('dashboard');
     } else {
       setActiveTab('landing');
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Save / Bookmark Career Toggle
@@ -219,6 +253,7 @@ export default function App() {
       setCounsellorInitialQuery(undefined);
     }
     setActiveTab('counsellor');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Retake Assessment
@@ -228,6 +263,7 @@ export default function App() {
     StorageService.saveAnswers({});
     StorageService.saveAssessmentIndex(0);
     setActiveTab('assessment');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Notifications Management
@@ -243,15 +279,8 @@ export default function App() {
     StorageService.saveNotifications(updated);
   };
 
-  // Language & Theme Changes
-  const handleChangeLanguage = (newLang: SupportedLanguage) => {
-    setLanguage(newLang);
-    StorageService.saveLanguage(newLang);
-  };
-
   const handleChangeTheme = (newTheme: ThemeMode) => {
     setTheme(newTheme);
-    StorageService.saveTheme(newTheme);
   };
 
   // Data Export & Delete
@@ -270,16 +299,18 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `restart_career_record_${profile?.name?.toLowerCase().replace(/\s+/g, '_') || 'candidate'}.json`;
+    a.download = `pathfind_record_${profile?.name?.toLowerCase().replace(/\s+/g, '_') || 'candidate'}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  // Real Account Sign Out
+  // Real Account Sign Out: clears session state, updates app state, and redirects to home
   const handleSignOut = () => {
     AuthService.logout();
     setAuthUser(null);
+    setPendingAssessmentIntent(false);
     setActiveTab('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Danger Zone - Purge all data
@@ -295,24 +326,28 @@ export default function App() {
     setSavedCareers([]);
     setChatHistory([]);
     setNotifications([]);
+    setPendingAssessmentIntent(false);
     setActiveTab('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // If Auth Screen is open, render isolated Apple-inspired Auth View
+  // If Auth Screen is open
   if (activeTab === 'auth') {
     return (
-      <AuthView
-        onAuthSuccess={handleAuthSuccess}
-        onCancel={() => setActiveTab(result ? 'dashboard' : 'landing')}
-        language={language}
-      />
+      <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+        <AuthView
+          initialMode={authInitialMode}
+          onSuccess={handleAuthSuccess}
+          onCancel={() => setActiveTab(result && authUser ? 'dashboard' : 'landing')}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans antialiased selection:bg-zinc-800 selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 flex flex-col font-sans antialiased selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
       
-      {/* Top Apple-styled Navigation */}
+      {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
         onSelectTab={(tab) => {
@@ -324,12 +359,13 @@ export default function App() {
         notifications={notifications}
         onMarkNotificationRead={handleMarkNotificationRead}
         onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
-        language={language}
-        onChangeLanguage={handleChangeLanguage}
         theme={theme}
         onChangeTheme={handleChangeTheme}
         onSelectDemoProfile={handleSelectDemoProfile}
-        onOpenAuth={() => setActiveTab('auth')}
+        onOpenAuth={(mode = 'signin') => {
+          setAuthInitialMode(mode);
+          setActiveTab('auth');
+        }}
         onLogout={handleSignOut}
         hasAssessmentResult={!!result}
       />
@@ -348,7 +384,6 @@ export default function App() {
                 setActiveTab('help');
               }
             }}
-            language={language}
           />
         )}
 
@@ -356,8 +391,7 @@ export default function App() {
           <OnboardingFlow
             initialSegment={onboardingInitialSegment}
             onComplete={handleOnboardingComplete}
-            onCancel={() => setActiveTab(result ? 'dashboard' : 'landing')}
-            language={language}
+            onCancel={() => setActiveTab(result && authUser ? 'dashboard' : 'landing')}
           />
         )}
 
@@ -369,8 +403,7 @@ export default function App() {
             initialIndex={assessmentIndex}
             onSaveAnswer={handleSaveAnswer}
             onComplete={handleAssessmentComplete}
-            onCancel={() => setActiveTab(result ? 'dashboard' : 'landing')}
-            language={language}
+            onCancel={() => setActiveTab(result && authUser ? 'dashboard' : 'landing')}
           />
         )}
 
@@ -383,7 +416,6 @@ export default function App() {
             onToggleSaveCareer={handleToggleSaveCareer}
             onOpenAICounsellor={() => handleOpenAICounsellor()}
             onRetakeAssessment={handleRetakeAssessment}
-            language={language}
           />
         )}
 
@@ -398,7 +430,6 @@ export default function App() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onRetakeAssessment={handleRetakeAssessment}
-            language={language}
           />
         )}
 
@@ -408,7 +439,6 @@ export default function App() {
             onRemoveCareer={handleRemoveSavedCareer}
             onNavigateToReport={() => setActiveTab('report')}
             onOpenAICounsellor={handleOpenAICounsellor}
-            language={language}
           />
         )}
 
@@ -423,7 +453,6 @@ export default function App() {
               setChatHistory(msgs);
               StorageService.saveChatHistory(msgs);
             }}
-            language={language}
             initialQuery={counsellorInitialQuery}
           />
         )}
@@ -432,12 +461,11 @@ export default function App() {
           <OpportunitiesView
             userCategory={profile?.reservationCategory}
             userIncome={profile?.annualFamilyIncome}
-            language={language}
           />
         )}
 
         {activeTab === 'help' && (
-          <HelpFAQView language={language} />
+          <HelpFAQView />
         )}
 
         {activeTab === 'feedback' && (
@@ -445,8 +473,7 @@ export default function App() {
             onSubmitFeedback={(fb) => {
               StorageService.saveFeedback(fb);
             }}
-            onBack={() => setActiveTab(result ? 'dashboard' : 'landing')}
-            language={language}
+            onBack={() => setActiveTab(result && authUser ? 'dashboard' : 'landing')}
             userEmail={profile?.email || authUser?.email}
           />
         )}
@@ -467,8 +494,6 @@ export default function App() {
             }}
             theme={theme}
             onChangeTheme={handleChangeTheme}
-            language={language}
-            onChangeLanguage={handleChangeLanguage}
             onExportData={handleExportData}
             onDeleteAllData={handleDeleteAllData}
             onSignOut={handleSignOut}
@@ -477,12 +502,12 @@ export default function App() {
 
         {activeTab === 'privacy' && (
           <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
               Privacy Architecture
             </h1>
-            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4 text-xs text-zinc-400 leading-relaxed">
+            <div className="p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 space-y-4 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed shadow-sm">
               <p>
-                Re\Start My Career operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored securely to generate your personalized career intelligence report.
+                PathFind operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored securely to generate your personalized career intelligence report.
               </p>
               <p>
                 Optional demographic indicators are strictly utilized to compute eligibility for Indian central, state, and corporate educational scholarships. They are never shared or sold to external third-party coaching institutes.
@@ -493,12 +518,12 @@ export default function App() {
 
         {activeTab === 'terms' && (
           <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
               Terms of Service
             </h1>
-            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4 text-xs text-zinc-400 leading-relaxed">
+            <div className="p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 space-y-4 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed shadow-sm">
               <p>
-                Re\Start My Career is a career intelligence and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
+                PathFind is a career intelligence and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
               </p>
               <p>
                 The outputs generated are intended for directional educational guidance and exploration. They do not constitute psychological, psychiatric, or diagnostic evaluation.
@@ -514,7 +539,6 @@ export default function App() {
           setActiveTab(tab);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        language={language}
       />
 
     </div>

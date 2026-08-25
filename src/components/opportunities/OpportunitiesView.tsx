@@ -1,29 +1,23 @@
 import React, { useState } from 'react';
 import { 
-  GraduationCap, 
   Search, 
-  Filter, 
   ExternalLink, 
   ShieldCheck, 
   Info,
   CheckCircle2
 } from 'lucide-react';
-import { Opportunity, SupportedLanguage, ReservationCategory } from '../../types';
-import { TRANSLATIONS } from '../../i18n/translations';
+import { ReservationCategory } from '../../types';
 import { SCHOLARSHIPS_DATA } from '../../data/scholarships';
 
 interface OpportunitiesViewProps {
   userCategory?: ReservationCategory;
   userIncome?: string;
-  language: SupportedLanguage;
 }
 
 export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
   userCategory,
   userIncome,
-  language,
 }) => {
-  const t = TRANSLATIONS[language];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedType, setSelectedType] = useState<string>('All');
@@ -46,19 +40,19 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
   });
 
   return (
-    <div className="w-full bg-zinc-950 text-zinc-100 min-h-screen pb-24 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="w-full bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen pb-24 selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
       
       {/* Header */}
-      <div className="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md">
+      <div className="border-b border-zinc-200 dark:border-zinc-900 bg-zinc-50/80 dark:bg-black/60 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
+          <div className="flex items-center gap-2 text-xs font-mono text-emerald-700 dark:text-emerald-400">
             <ShieldCheck className="w-4 h-4" />
             <span>Indian Financial Support Registry</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
-            {t.nav_opportunities}
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            Scholarships & Schemes
           </h1>
-          <p className="text-xs text-zinc-400 max-w-2xl">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-2xl">
             Accredited central government, state affirmative action, and merit-cum-means financial schemes to support your chosen educational pathway.
           </p>
         </div>
@@ -67,56 +61,59 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-6">
         
         {/* Transparent Disclaimer Banner */}
-        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-start gap-3 text-xs text-zinc-300">
-          <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-start gap-3 text-xs text-zinc-700 dark:text-zinc-300">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            Financial background and reservation criteria are used <strong>exclusively</strong> to match you with funding opportunities. They never restrict or bias your career recommendations.
+            Scholarships and reservation criteria are provided purely for financial feasibility planning. PathFind recommendations are strictly psychometric and are never narrowed based on socioeconomic background.
           </p>
         </div>
 
-        {/* Filter Controls Bar */}
-        <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 flex flex-col md:flex-row gap-4 items-center justify-between">
-          
-          {/* Search Input */}
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
+        {/* Search & Filter Controls */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="relative sm:col-span-1">
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-zinc-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search scheme name, provider..."
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-blue-500 font-mono"
+              placeholder="Search by scholarship, provider, or state..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
             />
           </div>
 
-          {/* Category & Type Selectors */}
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 focus:outline-none focus:border-blue-500 font-mono"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500"
             >
-              <option value="All">All Categories</option>
+              <option value="All">All Social Categories</option>
               <option value="General">General</option>
               <option value="OBC">OBC</option>
               <option value="SC">SC</option>
               <option value="ST">ST</option>
               <option value="EWS">EWS</option>
             </select>
+          </div>
 
+          <div>
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 focus:outline-none focus:border-blue-500 font-mono"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500"
             >
-              <option value="All">All Types</option>
+              <option value="All">All Types (Central, State, Corporate)</option>
               <option value="government_central">Central Government</option>
-              <option value="state_scheme">State Scheme</option>
-              <option value="private_corporate">Private / Corporate</option>
-              <option value="institutional">Institutional</option>
+              <option value="government_state">State Government</option>
+              <option value="private_merit">Merit / Corporate CSR</option>
             </select>
           </div>
+        </div>
 
+        {/* Matched Count */}
+        <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400 px-1">
+          <span>Showing {filteredOpportunities.length} opportunities</span>
+          {userCategory && <span>Profile Filter: {userCategory}</span>}
         </div>
 
         {/* Scholarships Grid */}
@@ -124,50 +121,48 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
           {filteredOpportunities.map((opp) => (
             <div
               key={opp.id}
-              className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col justify-between space-y-4 hover:border-zinc-700 transition-colors"
+              className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 flex flex-col justify-between space-y-6 shadow-sm hover:border-zinc-400 dark:hover:border-zinc-700 transition-all"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
-                    {opp.type.replace('_', ' ').toUpperCase()}
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-medium">
+                    {opp.provider}
                   </span>
-                  <span className="text-[10px] font-mono text-zinc-400">
-                    {opp.applicationDeadline}
+                  <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 capitalize">
+                    {opp.type.replace('_', ' ')}
                   </span>
                 </div>
 
-                <div>
-                  <span className="text-xs font-mono text-zinc-400">{opp.provider}</span>
-                  <h3 className="font-heading text-base font-bold text-zinc-100 mt-0.5">
-                    {opp.title}
-                  </h3>
-                </div>
+                <h3 className="text-base font-bold text-zinc-950 dark:text-white">
+                  {opp.title}
+                </h3>
 
-                <p className="text-xs text-zinc-400 leading-relaxed">
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   {opp.description}
                 </p>
 
-                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-1 text-xs">
-                  <span className="font-mono text-[10px] text-zinc-400 uppercase">Coverage / Benefit</span>
-                  <p className="text-emerald-300 font-mono font-semibold">
-                    {opp.coverage}
-                  </p>
-                </div>
-
-                <div className="space-y-1 text-[11px] text-zinc-400">
-                  <p><strong>Eligibility:</strong> {opp.eligibility}</p>
+                <div className="p-3 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 space-y-1.5 text-[11px]">
+                  <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                    <span>Coverage:</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{opp.coverage}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                    <span>Eligible Categories:</span>
+                    <span className="text-zinc-900 dark:text-zinc-200 font-mono">{opp.categoryMatch.join(', ')}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-zinc-800">
+              <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-zinc-500">Official Gov Portal</span>
                 <a
                   href={opp.applicationLink}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 font-mono"
+                  className="text-xs font-semibold text-zinc-900 dark:text-white hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <span>Official Application Portal</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <span>Apply Online</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>

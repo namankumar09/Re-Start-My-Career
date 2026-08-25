@@ -3,21 +3,11 @@ import {
   HelpCircle, 
   Search, 
   ChevronDown, 
-  ChevronUp, 
-  ShieldCheck, 
-  Sparkles, 
-  FileText 
+  ChevronUp
 } from 'lucide-react';
-import { FAQ_ITEMS, FAQItem } from '../../data/faqData';
-import { SupportedLanguage } from '../../types';
-import { TRANSLATIONS } from '../../i18n/translations';
+import { FAQ_ITEMS } from '../../data/faqData';
 
-interface HelpFAQViewProps {
-  language: SupportedLanguage;
-}
-
-export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
-  const t = TRANSLATIONS[language];
+export const HelpFAQView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
@@ -34,19 +24,19 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
   });
 
   return (
-    <div className="w-full bg-zinc-950 text-zinc-100 min-h-screen pb-24 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="w-full bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen pb-24 selection:bg-zinc-200 dark:selection:bg-zinc-800 selection:text-black dark:selection:text-white transition-colors duration-200">
       
       {/* Header */}
-      <div className="border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-md">
+      <div className="border-b border-zinc-200 dark:border-zinc-900 bg-zinc-50/80 dark:bg-black/60 backdrop-blur-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-mono text-blue-400">
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400">
             <HelpCircle className="w-4 h-4" />
             <span>Psychometric Methodology & Guidance FAQ</span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
             Frequently Asked Questions
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400">
             Understanding the Holland RIASEC engine, interest vs confidence gap analysis, and data governance.
           </p>
         </div>
@@ -55,7 +45,7 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 space-y-6">
         
         {/* Search & Category Filter */}
-        <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
             <input
@@ -63,7 +53,7 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search methodology questions..."
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-blue-500 font-mono"
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-500 font-mono"
             />
           </div>
 
@@ -72,10 +62,10 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-mono capitalize transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-mono capitalize transition-colors cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-blue-600 text-white font-semibold shadow-sm'
-                    : 'bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-black text-white dark:bg-white dark:text-black font-semibold shadow-sm'
+                    : 'bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200'
                 }`}
               >
                 {cat.replace('_', ' ')}
@@ -92,10 +82,10 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
             return (
               <div
                 key={idx}
-                className={`rounded-2xl border transition-all overflow-hidden ${
+                className={`rounded-2xl border transition-all overflow-hidden shadow-sm ${
                   isExpanded
-                    ? 'bg-zinc-900 border-zinc-700 shadow-lg'
-                    : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'
+                    ? 'bg-zinc-50 dark:bg-zinc-900 border-zinc-400 dark:border-zinc-700 shadow-md'
+                    : 'bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                 }`}
               >
                 <div
@@ -103,10 +93,10 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
                   className="p-5 cursor-pointer flex items-center justify-between gap-4 select-none"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-900">
+                    <span className="text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-300 dark:border-zinc-700">
                       0{idx + 1}
                     </span>
-                    <h3 className="font-heading text-sm font-semibold text-zinc-100">
+                    <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">
                       {item.question}
                     </h3>
                   </div>
@@ -117,7 +107,7 @@ export const HelpFAQView: React.FC<HelpFAQViewProps> = ({ language }) => {
                 </div>
 
                 {isExpanded && (
-                  <div className="px-5 pb-5 pt-1 border-t border-zinc-800/60 text-xs text-zinc-300 leading-relaxed">
+                  <div className="px-5 pb-5 pt-1 border-t border-zinc-200 dark:border-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
                     <p>{item.answer}</p>
                   </div>
                 )}

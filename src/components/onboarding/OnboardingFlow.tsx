@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  ArrowLeft, 
   ArrowRight, 
   Briefcase, 
   GraduationCap, 
   School, 
   ShieldCheck, 
-  User, 
-  Sparkles, 
   Info,
   CheckCircle2
 } from 'lucide-react';
@@ -17,26 +14,20 @@ import {
   ReservationCategory, 
   IncomeBracket, 
   IncomeDependency, 
-  SwitchReason, 
-  SupportedLanguage 
+  SwitchReason 
 } from '../../types';
-import { TRANSLATIONS } from '../../i18n/translations';
 
 interface OnboardingFlowProps {
   initialSegment?: Segment;
   onComplete: (profile: UserProfile) => void;
   onCancel: () => void;
-  language: SupportedLanguage;
 }
 
 export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   initialSegment,
   onComplete,
   onCancel,
-  language,
 }) => {
-  const t = TRANSLATIONS[language];
-
   // Steps: 1: Segment Selection, 2: Personal Info (+ Optional Scholarship), 3: Career Switch Details (if segment === 'career_switch')
   const [currentStep, setCurrentStep] = useState<number>(initialSegment ? 2 : 1);
   const [segment, setSegment] = useState<Segment>(initialSegment || 'career_switch');
@@ -76,7 +67,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
   const handleNext = () => {
     if (currentStep === 1) {
-      // Adjust default age based on segment
       if (segment === 'class_10') setAge(15);
       else if (segment === 'class_12') setAge(17);
       else setAge(26);
@@ -118,18 +108,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-zinc-950 text-zinc-100">
-      <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+      <div className="w-full max-w-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
         
         {/* Progress Bar & Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between text-xs font-mono text-zinc-400 mb-2">
+          <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400 mb-2">
             <span>Step {currentStep} of {segment === 'career_switch' ? 3 : 2}</span>
             <span className="uppercase">{segment.replace('_', ' ')}</span>
           </div>
-          <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 transition-all duration-300"
+              className="h-full bg-black dark:bg-white transition-all duration-300"
               style={{ width: `${(currentStep / (segment === 'career_switch' ? 3 : 2)) * 100}%` }}
             />
           </div>
@@ -139,36 +129,36 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         {currentStep === 1 && (
           <div className="space-y-6">
             <div className="space-y-2">
-              <span className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Moment Selection
               </span>
-              <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
                 Where are you in your career journey?
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Select your current life turning point. Questions and scoring are specifically tailored to this context.
               </p>
             </div>
 
             <div className="space-y-3.5 pt-2">
-              {/* Option 01: Career Switch (MUST BE FIRST) */}
+              {/* Option 01: Career Switch (FIRST) */}
               <div
                 onClick={() => setSegment('career_switch')}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all flex items-start gap-4 ${
                   segment === 'career_switch'
-                    ? 'bg-blue-950/30 border-blue-500 shadow-md ring-1 ring-blue-500/20'
-                    : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
+                    ? 'bg-zinc-100 dark:bg-zinc-800/80 border-black dark:border-white shadow-md ring-1 ring-black/10 dark:ring-white/10'
+                    : 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl ${segment === 'career_switch' ? 'bg-blue-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                <div className={`p-2.5 rounded-xl ${segment === 'career_switch' ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-zinc-100">{t.segment_01_title}</h3>
-                    {segment === 'career_switch' && <CheckCircle2 className="w-4 h-4 text-blue-400" />}
+                    <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Career Switch (Working Professionals)</h3>
+                    {segment === 'career_switch' && <CheckCircle2 className="w-4 h-4 text-zinc-900 dark:text-white" />}
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                     For professionals already working who are considering a new direction, escaping burnout, or seeking sustainable pivots.
                   </p>
                 </div>
@@ -179,19 +169,19 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 onClick={() => setSegment('class_12')}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all flex items-start gap-4 ${
                   segment === 'class_12'
-                    ? 'bg-blue-950/30 border-blue-500 shadow-md ring-1 ring-blue-500/20'
-                    : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
+                    ? 'bg-zinc-100 dark:bg-zinc-800/80 border-black dark:border-white shadow-md ring-1 ring-black/10 dark:ring-white/10'
+                    : 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl ${segment === 'class_12' ? 'bg-emerald-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                <div className={`p-2.5 rounded-xl ${segment === 'class_12' ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                   <GraduationCap className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-zinc-100">{t.segment_02_title}</h3>
-                    {segment === 'class_12' && <CheckCircle2 className="w-4 h-4 text-blue-400" />}
+                    <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Class 12 (Degrees & Entrances)</h3>
+                    {segment === 'class_12' && <CheckCircle2 className="w-4 h-4 text-zinc-900 dark:text-white" />}
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                     Choose your undergraduate degree, entrance exam focus (JEE/NEET/CUET/CLAT/NID), or higher education direction.
                   </p>
                 </div>
@@ -202,37 +192,37 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 onClick={() => setSegment('class_10')}
                 className={`p-5 rounded-2xl border cursor-pointer transition-all flex items-start gap-4 ${
                   segment === 'class_10'
-                    ? 'bg-blue-950/30 border-blue-500 shadow-md ring-1 ring-blue-500/20'
-                    : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
+                    ? 'bg-zinc-100 dark:bg-zinc-800/80 border-black dark:border-white shadow-md ring-1 ring-black/10 dark:ring-white/10'
+                    : 'bg-white dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-700'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl ${segment === 'class_10' ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+                <div className={`p-2.5 rounded-xl ${segment === 'class_10' ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                   <School className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-zinc-100">{t.segment_03_title}</h3>
-                    {segment === 'class_10' && <CheckCircle2 className="w-4 h-4 text-blue-400" />}
+                    <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-100">Class 10 (Stream Selection)</h3>
+                    {segment === 'class_10' && <CheckCircle2 className="w-4 h-4 text-zinc-900 dark:text-white" />}
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
                     Select your 11th-grade academic stream (PCM, PCB, Commerce, Humanities) based on intrinsic curiosity.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-zinc-800">
+            <div className="pt-6 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
-                {t.btn_back}
+                Back
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5"
+                className="px-6 py-2.5 rounded-full bg-black text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <span>Continue</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -245,13 +235,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         {currentStep === 2 && (
           <div className="space-y-6">
             <div className="space-y-1">
-              <span className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Candidate Profile
               </span>
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-zinc-100">
+              <h2 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
                 Personal Information
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 Required details to calibrate your assessment report.
               </p>
             </div>
@@ -259,7 +249,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             {/* Required Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   Full Name *
                 </label>
                 <input
@@ -267,13 +257,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Aarav Sharma"
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
-                {errors.name && <p className="text-[11px] text-red-400 mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-[11px] text-red-500 dark:text-red-400 mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   Age *
                 </label>
                 <input
@@ -282,19 +272,19 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   onChange={(e) => setAge(parseInt(e.target.value) || 0)}
                   min="12"
                   max="70"
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 font-mono"
                 />
-                {errors.age && <p className="text-[11px] text-red-400 mt-1">{errors.age}</p>}
+                {errors.age && <p className="text-[11px] text-red-500 dark:text-red-400 mt-1">{errors.age}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   Gender
                 </label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -304,7 +294,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   Mobile Number (Optional)
                 </label>
                 <input
@@ -312,12 +302,12 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-blue-500 font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   City / State *
                 </label>
                 <input
@@ -325,13 +315,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="e.g. Bengaluru, Karnataka"
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
-                {errors.city && <p className="text-[11px] text-red-400 mt-1">{errors.city}</p>}
+                {errors.city && <p className="text-[11px] text-red-500 dark:text-red-400 mt-1">{errors.city}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                   Current Course / Education *
                 </label>
                 <input
@@ -341,35 +331,35 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   placeholder={
                     segment === 'class_10' ? 'e.g. Class 10 CBSE' : segment === 'class_12' ? 'e.g. Class 12 PCB' : 'e.g. B.Tech Computer Science'
                   }
-                  className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
                 />
-                {errors.currentEducation && <p className="text-[11px] text-red-400 mt-1">{errors.currentEducation}</p>}
+                {errors.currentEducation && <p className="text-[11px] text-red-500 dark:text-red-400 mt-1">{errors.currentEducation}</p>}
               </div>
             </div>
 
             {/* Optional Scholarship & Schemes Section */}
-            <div className="pt-4 border-t border-zinc-800 space-y-3">
+            <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-semibold text-zinc-200">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">
                   Optional Information (Scholarships & Financial Support)
                 </h3>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 text-[11px] text-zinc-400 leading-relaxed">
-                <Info className="w-3.5 h-3.5 text-blue-400 inline mr-1 -mt-0.5" />
+              <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <Info className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 inline mr-1 -mt-0.5" />
                 This information is optional. It is used only to identify scholarships, fee support and government schemes you may qualify for. It is never used to narrow your career recommendations.
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
                     Reservation Category (Optional)
                   </label>
                   <select
                     value={reservationCategory}
                     onChange={(e) => setReservationCategory(e.target.value as ReservationCategory)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-300 focus:outline-none focus:border-zinc-500"
                   >
                     <option value="Prefer not to say">Prefer not to say</option>
                     <option value="General">General</option>
@@ -381,13 +371,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1">
+                  <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
                     Annual Family Income (Optional)
                   </label>
                   <select
                     value={annualFamilyIncome}
                     onChange={(e) => setAnnualFamilyIncome(e.target.value as IncomeBracket)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-300 focus:outline-none focus:border-zinc-500"
                   >
                     <option value="Prefer not to say">Prefer not to say</option>
                     <option value="Under ₹2.5 Lakhs">Under ₹2.5 Lakhs</option>
@@ -399,18 +389,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-zinc-800">
+            <div className="pt-6 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
-                {t.btn_back}
+                Back
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5"
+                className="px-6 py-2.5 rounded-full bg-black text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <span>{segment === 'career_switch' ? 'Next: Work Context' : 'Start 24-Question Assessment'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -423,20 +413,20 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         {currentStep === 3 && segment === 'career_switch' && (
           <div className="space-y-6">
             <div className="space-y-1">
-              <span className="text-xs font-mono text-blue-400 uppercase tracking-wider">
+              <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                 Career Switch Constraints
               </span>
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-zinc-100">
+              <h2 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
                 Financial Responsibility & Transition Context
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
                 These answers actively shape whether we recommend income-preserving bridge roles or higher-flexibility pivots.
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-2">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Who depends on your income? *
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -445,10 +435,10 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                       key={dep}
                       type="button"
                       onClick={() => setIncomeDependency(dep)}
-                      className={`p-3 rounded-xl border text-xs font-medium transition-all text-left ${
+                      className={`p-3 rounded-xl border text-xs font-medium transition-all text-left cursor-pointer ${
                         incomeDependency === dep
-                          ? 'bg-blue-950/40 border-blue-500 text-white shadow-sm'
-                          : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                          ? 'bg-zinc-100 dark:bg-zinc-800 border-black dark:border-white text-zinc-950 dark:text-white shadow-sm ring-1 ring-black/10 dark:ring-white/10'
+                          : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-700'
                       }`}
                     >
                       {dep}
@@ -458,7 +448,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-2">
+                <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Why are you considering a change? *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -467,10 +457,10 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                       key={reason}
                       type="button"
                       onClick={() => setSwitchReason(reason)}
-                      className={`p-2.5 rounded-xl border text-xs font-medium transition-all text-center ${
+                      className={`p-2.5 rounded-xl border text-xs font-medium transition-all text-center cursor-pointer ${
                         switchReason === reason
-                          ? 'bg-blue-950/40 border-blue-500 text-white'
-                          : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                          ? 'bg-zinc-100 dark:bg-zinc-800 border-black dark:border-white text-zinc-950 dark:text-white shadow-sm ring-1 ring-black/10 dark:ring-white/10'
+                          : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-700'
                       }`}
                     >
                       {reason}
@@ -481,7 +471,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                     Years of Professional Experience
                   </label>
                   <input
@@ -490,18 +480,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                     onChange={(e) => setExperienceYears(parseInt(e.target.value) || 0)}
                     min="0"
                     max="45"
-                    className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-blue-500 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500 font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-300 mb-1">
+                  <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
                     Current Field / Domain
                   </label>
                   <select
                     value={currentField}
                     onChange={(e) => setCurrentField(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-500"
                   >
                     <option value="Software">Software / IT / QA</option>
                     <option value="Finance">Finance / Banking / Accounting</option>
@@ -519,18 +509,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            <div className="pt-6 flex items-center justify-between border-t border-zinc-800">
+            <div className="pt-6 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                className="px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 text-xs text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200 transition-colors cursor-pointer"
               >
-                {t.btn_back}
+                Back
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-6 py-2.5 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5"
+                className="px-6 py-2.5 rounded-full bg-black text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <span>Begin Assessment</span>
                 <ArrowRight className="w-3.5 h-3.5" />
