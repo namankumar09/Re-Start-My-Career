@@ -132,7 +132,7 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
         {/* Matched Count */}
         <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400 px-1">
           <span>Showing {filteredOpportunities.length} opportunities</span>
-          {userCategory && <span>Profile Filter: {userCategory}</span>}
+          {profile?.reservationCategory && <span>Profile Filter: {profile.reservationCategory}</span>}
         </div>
 
         {/* Scholarships Grid */}

@@ -180,10 +180,10 @@ export function generateRecommendations(
   result: AssessmentResult,
   profile: UserProfile
 ): Recommendation[] {
-  const { scores, segment } = result;
+  const { scores, segment, topDimensions } = result;
 
   // Filter and score careers from database
-  const scoredCareers: { career: Career; fitScore: number }[] = [];
+  const scoredCareers: { career: Career; rawFit: number; primaryDimScore: number }[] = [];
 
   CAREER_DATABASE.forEach((career) => {
     // 1. Strict segment compatibility
@@ -193,6 +193,7 @@ export function generateRecommendations(
 
     let fit = 0;
     let totalWeight = 0;
+    let primaryDimScore = 0;
 
     // 2. Primary dimension alignment
     career.primaryDimensions.forEach((dim) => {
@@ -201,8 +202,13 @@ export function generateRecommendations(
       const confidence = dimData?.confidenceScore || 50;
       
       // Interest is weighted more heavily than confidence
-      fit += (interest * 0.7) + (confidence * 0.3);
+      const combined = (interest * 0.7) + (confidence * 0.3);
+      fit += combined;
       totalWeight += 1;
+
+      if (combined > primaryDimScore) {
+        primaryDimScore = combined;
+      }
     });
 
     // 3. Secondary dimension alignment
@@ -216,6 +222,12 @@ export function generateRecommendations(
     });
 
     let avgFit = fit / totalWeight;
+
+    // WIDEN SPREAD: Penalize if primary dimension is not in user's top 3
+    const hasTop3Primary = career.primaryDimensions.some(dim => topDimensions.includes(dim));
+    if (!hasTop3Primary) {
+      avgFit -= 25; // Significant penalty for mismatched primary
+    }
 
     // 4. Gap Adjustments
     let hasLatentGap = false;
@@ -256,22 +268,48 @@ export function generateRecommendations(
       }
     }
 
-    // Normalize to 60-98 range for UI aesthetic
-    const normalizedFit = Math.min(98, Math.max(60, Math.round(avgFit)));
-
     scoredCareers.push({
       career,
-      fitScore: normalizedFit,
+      rawFit: avgFit,
+      primaryDimScore,
     });
   });
 
-  // Sort descending by fitScore
-  scoredCareers.sort((a, b) => b.fitScore - a.fitScore);
+  // Sort descending by rawFit, with deterministic tie-breaks if within 1 point
+  scoredCareers.sort((a, b) => {
+    const diff = b.rawFit - a.rawFit;
+    if (Math.abs(diff) < 1.0) {
+      // Tie-break A: primaryDimScore (how strong the career's primary dimension is for this user)
+      const pdDiff = b.primaryDimScore - a.primaryDimScore;
+      if (Math.abs(pdDiff) >= 1.0) {
+        return pdDiff;
+      }
+      // Tie-break B: Alphabetical by title
+      return a.career.title.localeCompare(b.career.title);
+    }
+    return diff;
+  });
 
   // Pick top 4-6 recommendations
   const topList = scoredCareers.slice(0, 5);
 
-  return topList.map(({ career, fitScore }) => {
+  // Rescale for display: Map the top actual scores to a sensible UI range (e.g. 75-98)
+  const maxRaw = topList[0]?.rawFit || 0;
+  const minRaw = topList[topList.length - 1]?.rawFit || 0;
+  const rawRange = maxRaw - minRaw;
+  const displayMin = 75;
+  const displayMax = 98;
+  const displayRange = displayMax - displayMin;
+
+  return topList.map(({ career, rawFit }, index) => {
+    let fitScore = displayMax; // Top gets 98
+    if (rawRange > 0) {
+      fitScore = displayMin + ((rawFit - minRaw) / rawRange) * displayRange;
+    } else if (index > 0) {
+      fitScore = displayMax - (index * 2); // Fallback scaling if all scores are identical
+    }
+    fitScore = Math.round(fitScore);
+
     const primDim = career.primaryDimensions[0];
     const pScore = scores[primDim];
     

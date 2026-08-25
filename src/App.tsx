@@ -150,9 +150,10 @@ export default function App() {
     StorageService.saveResult(newResult);
     StorageService.saveAnswers(finalAnswers);
 
+    let recs: Recommendation[] = [];
     // Provide immediate local fallback first
     if (profile) {
-      const recs = generateRecommendations(newResult, profile);
+      recs = generateRecommendations(newResult, profile);
       setRecommendations(recs);
       StorageService.saveRecommendations(recs);
     }
