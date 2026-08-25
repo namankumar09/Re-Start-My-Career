@@ -1,16 +1,11 @@
 import React from 'react';
 import { 
   ArrowRight, 
-  Sparkles, 
-  Compass, 
-  ShieldCheck, 
   ChevronRight, 
-  CheckCircle2, 
-  TrendingUp, 
+  Check, 
   Briefcase, 
   GraduationCap, 
-  School,
-  Layers
+  School 
 } from 'lucide-react';
 import { Segment, SupportedLanguage } from '../../types';
 import { TRANSLATIONS } from '../../i18n/translations';
@@ -43,64 +38,63 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   return (
-    <div className="w-full bg-zinc-950 text-zinc-100 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="w-full bg-black text-zinc-100 selection:bg-zinc-800 selection:text-white">
       
-      {/* 1. CINEMATIC HERO (Apple-style spacing & typography) */}
-      <section className="relative pt-24 pb-20 md:pt-36 md:pb-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center flex flex-col items-center">
+      {/* 1. HERO SECTION (Apple-level typography, restraint & whitespace) */}
+      <section className="relative pt-24 pb-20 sm:pt-32 sm:pb-28 md:pt-40 md:pb-36 px-6 sm:px-8 max-w-5xl mx-auto text-center flex flex-col items-center">
         
-        {/* Minimal pill header */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 font-mono tracking-tight mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-          <span>Holland RIASEC · Interest vs. Confidence</span>
-        </div>
-
-        {/* Oversized editorial headline */}
-        <h1 className="font-heading text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-zinc-100 max-w-4xl leading-[1.08] mb-4">
-          {t.hero_statement_1}
-        </h1>
-        <h2 className="font-heading text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-blue-400 max-w-4xl leading-[1.12] mb-8">
-          {t.hero_statement_2}
-        </h2>
-
-        {/* Concise supporting copy */}
-        <p className="text-base sm:text-lg text-zinc-400 max-w-2xl font-normal leading-relaxed mb-12">
-          {t.hero_supporting}
+        {/* Subtle typography eyebrow */}
+        <p className="text-xs sm:text-sm font-medium tracking-wide text-zinc-400 mb-6 uppercase">
+          Psychometric Signals · Indian Educational Pathways
         </p>
 
-        {/* Primary and secondary CTAs */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+        {/* Large, bold display headlines */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white leading-[1.08] max-w-4xl">
+          You don&apos;t need more career advice.
+        </h1>
+        <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-zinc-400 leading-[1.12] max-w-4xl mt-3 mb-8">
+          You need a clearer signal.
+        </h2>
+
+        {/* Supporting Copy */}
+        <p className="text-base sm:text-lg text-zinc-400 max-w-2xl font-normal leading-relaxed mb-10">
+          Re\Start My Career isolates what naturally pulls your curiosity from what you merely learned to tolerate — mapping your true psychometric profile to viable Indian educational and professional pathways.
+        </p>
+
+        {/* Apple-style Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto">
           <button
             onClick={() => onStartAssessment()}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-sm font-semibold tracking-tight transition-all shadow-lg hover:shadow-zinc-800/20 flex items-center justify-center gap-2 group"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black hover:bg-zinc-200 text-sm font-semibold tracking-tight transition-all active:scale-[0.98] shadow-lg flex items-center justify-center gap-2"
           >
-            <span>{t.cta_find_direction}</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            <span>Take the Assessment</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
 
           <button
             onClick={onExploreHowItWorks}
-            className="w-full sm:w-auto px-7 py-4 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white text-sm font-medium tracking-tight transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-transparent hover:bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white text-sm font-medium tracking-tight transition-all flex items-center justify-center gap-2"
           >
-            <span>{t.cta_see_how}</span>
+            <span>Learn How It Works</span>
           </button>
         </div>
 
-        {/* Evaluation Personas Strip */}
-        <div className="mt-16 pt-10 border-t border-zinc-900 w-full max-w-3xl flex flex-col items-center">
-          <p className="text-xs font-mono text-zinc-400 uppercase tracking-wider mb-4">
-            Direct Demo Personas (One-Click Evaluation)
+        {/* Minimalist Demo Persona Strip */}
+        <div className="mt-20 pt-10 border-t border-zinc-900 w-full max-w-3xl flex flex-col items-center">
+          <p className="text-xs text-zinc-400 font-medium tracking-wider uppercase mb-4">
+            Try a 1-Click Evaluation Demo
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full">
             {DEMO_PROFILES.map((dp) => (
               <button
                 key={dp.id}
                 onClick={() => onSelectDemoProfile(dp)}
-                className="p-3 rounded-xl bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-800/60 hover:border-zinc-700 text-left transition-all group"
+                className="p-3 rounded-xl bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 hover:border-zinc-700 text-left transition-all group"
               >
-                <div className="text-[11px] font-semibold text-zinc-200 group-hover:text-blue-300 truncate">
+                <div className="text-xs font-semibold text-zinc-200 group-hover:text-white truncate">
                   {dp.name}
                 </div>
-                <div className="text-[10px] text-zinc-400 font-mono truncate">
+                <div className="text-[11px] text-zinc-400 truncate mt-0.5">
                   {dp.badge}
                 </div>
               </button>
@@ -109,113 +103,118 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 2. THE PROBLEM (Spacious contrast section) */}
-      <section className="py-24 bg-zinc-900/40 border-y border-zinc-900 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-            
-            <div className="md:col-span-5 space-y-4">
-              <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
-                01 / {t.section_problem_title}
-              </span>
-              <h3 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100">
-                Most career advice asks: “What are you good at?”
-              </h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                {t.section_problem_p1}
-              </p>
-            </div>
+      {/* 2. THE CORE PROBLEM (Editorial layout with large typography) */}
+      <section className="py-24 sm:py-32 border-t border-zinc-900 px-6 sm:px-8">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 sm:gap-16 items-center">
+          
+          <div className="md:col-span-5 space-y-4">
+            <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+              The Fundamental Flaw
+            </p>
+            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
+              Most career tests only ask what you are already good at.
+            </h3>
+            <p className="text-sm text-zinc-400 leading-relaxed pt-2">
+              That measures your past environment and test-taking coaching — not your intrinsic cognitive engine. When you confuse current skill with long-term interest, you end up excelling at careers that burn you out.
+            </p>
+          </div>
 
-            <div className="md:col-span-7 p-8 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-6">
-              <div className="space-y-2">
-                <p className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
-                  We ask two distinct questions:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="p-4 rounded-xl bg-blue-950/20 border border-blue-900/30">
-                    <p className="text-xs font-mono text-blue-400 mb-1">01 · Intrinsic Pull</p>
-                    <p className="text-base font-semibold text-zinc-100">“What pulls you?”</p>
-                    <p className="text-xs text-zinc-400 mt-2">What engages your curiosity before anyone tells you what is prestigious.</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-900/30">
-                    <p className="text-xs font-mono text-emerald-400 mb-1">02 · Self-Efficacy</p>
-                    <p className="text-base font-semibold text-zinc-100">“What do you believe you can do?”</p>
-                    <p className="text-xs text-zinc-400 mt-2">Your current perceived capability and readiness to execute under pressure.</p>
-                  </div>
+          <div className="md:col-span-7 space-y-4">
+            <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-6">
+              <p className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
+                We measure two independent dimensions:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+                  <p className="text-xs text-zinc-400 font-medium mb-1">01 · Intrinsic Pull</p>
+                  <p className="text-base font-semibold text-white">“What pulls you?”</p>
+                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    What captures your curiosity before parental expectations or peer prestige intervene.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/80">
+                  <p className="text-xs text-zinc-400 font-medium mb-1">02 · Self-Efficacy</p>
+                  <p className="text-base font-semibold text-white">“What do you believe you can do?”</p>
+                  <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    Your current confidence and readiness to execute under actual exam or job conditions.
+                  </p>
                 </div>
               </div>
-              <p className="text-xs text-zinc-400 border-t border-zinc-800 pt-4 leading-relaxed">
-                {t.section_problem_p2}
+
+              <p className="text-xs text-zinc-400 leading-relaxed border-t border-zinc-900 pt-4">
+                When interest is high but confidence is low, that is a <strong>Latent Gap</strong> — a high-potential career path you may have prematurely dismissed simply because no one encouraged you early on.
               </p>
             </div>
-
           </div>
+
         </div>
       </section>
 
       {/* 3. THE SIGNAL: INTEREST VS. CONFIDENCE (Interactive Hexagon) */}
-      <section id="how-it-works" className="py-28 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <section id="how-it-works" className="py-24 sm:py-32 border-t border-zinc-900 px-6 sm:px-8 max-w-5xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-mono text-amber-400 uppercase tracking-widest">
-            02 / {t.section_signal_title}
-          </span>
-          <h3 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100">
+          <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+            Holland RIASEC Architecture
+          </p>
+          <h3 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
             The Latent Gap is where careers get quietly abandoned.
           </h3>
-          <p className="text-base text-zinc-400 leading-relaxed">
-            When interest is high but confidence is low, students and professionals assume they aren’t "cut out" for it. It is almost always a lack of early exposure or encouragement — not a lack of talent.
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
+            Our 24-question assessment maps Realistic, Investigative, Artistic, Social, Enterprising, and Conventional dimensions with mathematical precision.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-zinc-900/30 border border-zinc-800/80 rounded-3xl p-6 sm:p-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 rounded-3xl bg-zinc-950 border border-zinc-900">
           
           <div className="lg:col-span-6 flex justify-center">
-            <HexagonSVG scores={sampleScores} size={360} interactive={false} />
+            <HexagonSVG scores={sampleScores} size={340} interactive={false} />
           </div>
 
           <div className="lg:col-span-6 space-y-6">
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-blue-900/40 border border-blue-500/50 flex items-center justify-center text-blue-400 font-mono text-xs font-bold shrink-0 mt-0.5">
+              <div className="flex items-start gap-3.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5">
                   1
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-zinc-100">24 Rigorous Questions Per Life Stage</h4>
+                  <h4 className="text-sm font-semibold text-white">24 Targeted Questions</h4>
                   <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    18 interest questions identify your intrinsic psychological attraction. 6 confidence questions isolate your perceived execution readiness.
+                    18 interest questions identify your raw intrinsic direction. 6 confidence questions isolate perceived execution readiness.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-amber-900/40 border border-amber-500/50 flex items-center justify-center text-amber-400 font-mono text-xs font-bold shrink-0 mt-0.5">
+              <div className="flex items-start gap-3.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5">
                   2
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-zinc-100">Deterministic Mathematical Scoring</h4>
+                  <h4 className="text-sm font-semibold text-white">Mathematical Gap Classification</h4>
                   <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    Scores are normalized to 0–100 per dimension. Gaps greater than +20 trigger Latent exploration; gaps below -20 highlight overbuilt routines.
+                    Normalized 0–100 scores cleanly flag Latent (high interest, low confidence) and Overbuilt (low interest, high training) fields.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-full bg-emerald-900/40 border border-emerald-500/50 flex items-center justify-center text-emerald-400 font-mono text-xs font-bold shrink-0 mt-0.5">
+              <div className="flex items-start gap-3.5">
+                <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-semibold text-white shrink-0 mt-0.5">
                   3
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-zinc-100">Authentic Indian Education Pathways</h4>
+                  <h4 className="text-sm font-semibold text-white">Ground Truth Indian Pathways</h4>
                   <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                    Mapped directly against JEE, NEET, CUET, CLAT, NID, NIFT, CA, and UPSC entrance criteria, realistic timelines, and actual work environments.
+                    Direct mapping to JEE, NEET, CUET, CLAT, NID, NIFT, CA, UPSC, and alternative professional degrees with realistic timelines.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-zinc-800">
+            <div className="pt-4 border-t border-zinc-900">
               <button
                 onClick={() => onStartAssessment()}
-                className="px-6 py-3 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-semibold tracking-tight transition-all flex items-center gap-2"
+                className="px-6 py-2.5 rounded-full bg-white text-black hover:bg-zinc-200 text-xs font-semibold tracking-tight transition-all inline-flex items-center gap-1.5"
               >
                 <span>Take the Assessment</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -226,102 +225,102 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 4. THREE TARGET MOMENTS (Career Switch first!) */}
-      <section className="py-24 bg-zinc-900/20 border-t border-zinc-900 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto space-y-12">
+      {/* 4. THREE TARGET LIFE STAGES (Career Switch first) */}
+      <section className="py-24 sm:py-32 border-t border-zinc-900 px-6 sm:px-8">
+        <div className="max-w-5xl mx-auto space-y-12">
           
           <div className="max-w-2xl">
-            <span className="text-xs font-mono text-blue-400 uppercase tracking-widest">
-              03 / Designed for Three Turning Points
-            </span>
-            <h3 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 mt-2">
-              Specific questions tailored to your exact life stage.
+            <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+              Three Crucial Junctures
+            </p>
+            <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-2">
+              Tailored questions for your exact stage of life.
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            {/* Card 01: Career Switch (MUST BE FIRST) */}
-            <div className="p-8 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+            {/* Card 01: Career Switch (FIRST) */}
+            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between hover:border-zinc-700 transition-colors">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-800/60 flex items-center justify-center text-blue-400">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-xs font-mono text-blue-400 font-semibold">{t.segment_01_title}</span>
-                  <h4 className="font-heading text-xl font-bold text-zinc-100 mt-1">
+                  <span className="text-xs text-zinc-400 font-semibold uppercase">{t.segment_01_title}</span>
+                  <h4 className="text-xl font-bold text-white mt-1">
                     Working Professionals
                   </h4>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
                   {t.segment_01_desc}
                 </p>
-                <div className="text-[11px] font-mono text-zinc-400 bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
-                  Factors in financial dependency: primary earner vs no dependants to recommend income-preserving vs higher-flexibility transitions.
+                <div className="text-xs text-zinc-400 bg-black p-3.5 rounded-xl border border-zinc-900">
+                  Factors in financial dependency: distinguishes income-preserving transitions from high-risk restarts.
                 </div>
               </div>
               <button
                 onClick={() => onStartAssessment('career_switch')}
-                className="mt-6 w-full py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Select Career Switch</span>
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {/* Card 02: Class 12 */}
-            <div className="p-8 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between hover:border-zinc-700 transition-colors">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
                   <GraduationCap className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-xs font-mono text-emerald-400 font-semibold">{t.segment_02_title}</span>
-                  <h4 className="font-heading text-xl font-bold text-zinc-100 mt-1">
+                  <span className="text-xs text-zinc-400 font-semibold uppercase">{t.segment_02_title}</span>
+                  <h4 className="text-xl font-bold text-white mt-1">
                     Higher Secondary
                   </h4>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
                   {t.segment_02_desc}
                 </p>
-                <div className="text-[11px] font-mono text-zinc-400 bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
-                  Evaluates undergraduate degree selection, entrance pressures (JEE, NEET, CUET, CLAT, NID), and allied career routes beyond mainstream defaults.
+                <div className="text-xs text-zinc-400 bg-black p-3.5 rounded-xl border border-zinc-900">
+                  Evaluates undergraduate degree options, entrance exams, and allied fields beyond default engineering/medical paths.
                 </div>
               </div>
               <button
                 onClick={() => onStartAssessment('class_12')}
-                className="mt-6 w-full py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Select Class 12</span>
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
             {/* Card 03: Class 10 */}
-            <div className="p-8 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex flex-col justify-between hover:border-zinc-700 transition-colors">
+            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between hover:border-zinc-700 transition-colors">
               <div className="space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-800/60 flex items-center justify-center text-purple-400">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
                   <School className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-xs font-mono text-purple-400 font-semibold">{t.segment_03_title}</span>
-                  <h4 className="font-heading text-xl font-bold text-zinc-100 mt-1">
+                  <span className="text-xs text-zinc-400 font-semibold uppercase">{t.segment_03_title}</span>
+                  <h4 className="text-xl font-bold text-white mt-1">
                     Secondary School
                   </h4>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
                   {t.segment_03_desc}
                 </p>
-                <div className="text-[11px] font-mono text-zinc-400 bg-zinc-950 p-3 rounded-lg border border-zinc-800/80">
-                  Grounds 11th-grade stream selection (PCM, PCB, Commerce with Math, Humanities) in psychological curiosity rather than peer momentum.
+                <div className="text-xs text-zinc-400 bg-black p-3.5 rounded-xl border border-zinc-900">
+                  Grounds 11th-grade stream selection (PCM, PCB, Commerce, Humanities) in intrinsic interest rather than peer pressure.
                 </div>
               </div>
               <button
                 onClick={() => onStartAssessment('class_10')}
-                className="mt-6 w-full py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
               >
                 <span>Select Class 10</span>
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -330,75 +329,75 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 5. DUAL REPORT PREVIEW (Student vs Parent Document) */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <section className="py-24 sm:py-32 border-t border-zinc-900 px-6 sm:px-8 max-w-5xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
-            04 / Dual Document Architecture
-          </span>
-          <h3 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100">
-            One underlying assessment. Two genuinely different documents.
+          <p className="text-xs text-zinc-400 font-medium uppercase tracking-widest">
+            Dual Output Architecture
+          </p>
+          <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            One underlying assessment. Two distinct documents.
           </h3>
           <p className="text-sm text-zinc-400">
-            Because a student needs to know what pulls them, while parents need to know about stability, accredited colleges, and practical risk.
+            A candidate needs to know what pulls them; parents need clarity on long-term stability, accredited colleges, and practical risk.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           
-          {/* For You Preview */}
-          <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-              <span className="text-xs font-semibold text-blue-400 font-mono uppercase">For You (Candidate)</span>
-              <span className="text-[10px] font-mono text-zinc-400">Deep Psychometrics</span>
+          {/* For Candidate */}
+          <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-900">
+              <span className="text-xs font-semibold text-white uppercase tracking-wider">For Candidate</span>
+              <span className="text-xs text-zinc-400">Detailed Psychometrics</span>
             </div>
-            <h4 className="font-heading text-lg font-semibold text-zinc-100">
+            <h4 className="text-base font-semibold text-white">
               “You’re built for work where investigation turns into something practically useful.”
             </h4>
-            <ul className="space-y-2 text-xs text-zinc-400">
+            <ul className="space-y-2.5 text-xs text-zinc-400">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
                 <span>Full Interest vs. Confidence numerical gap analysis</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                <span>Interactive Holland Hexagon with Latent dimension tags</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Interactive Holland Hexagon with Latent dimension signals</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                <span>Ranked recommendations with numerical reasoning chains</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Ranked career recommendations with reasoning chains</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                <span>Unfiltered watch-outs & Next 30 Days action plan</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Transparent reality checks and 30-Day execution roadmap</span>
               </li>
             </ul>
           </div>
 
-          {/* For Parents Preview */}
-          <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
-              <span className="text-xs font-semibold text-emerald-400 font-mono uppercase">For Your Parents (Family)</span>
-              <span className="text-[10px] font-mono text-zinc-400">Constructive Dialogue</span>
+          {/* For Parents */}
+          <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-900">
+              <span className="text-xs font-semibold text-white uppercase tracking-wider">For Family & Parents</span>
+              <span className="text-xs text-zinc-400">Constructive Dialogue</span>
             </div>
-            <h4 className="font-heading text-lg font-semibold text-zinc-100">
+            <h4 className="text-base font-semibold text-white">
               “Demonstrated strengths in analytical problem-solving and structured reliability.”
             </h4>
-            <ul className="space-y-2 text-xs text-zinc-400">
+            <ul className="space-y-2.5 text-xs text-zinc-400">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Addresses parental priorities: stability, employability & education cost</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Addresses parental priorities: stability, cost & employability</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Removes raw test numbers to avoid unproductive grading arguments</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Eliminates test score anxiety and grading arguments</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Outlines established accredited Indian institutions and entrance routes</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Outlines accredited Indian universities and government entrance routes</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Ends with “One Small Ask” for supportive home dialogue</span>
+                <Check className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+                <span>Provides &ldquo;One Small Ask&rdquo; for supportive home conversation</span>
               </li>
             </ul>
           </div>
@@ -406,19 +405,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 6. FINAL ACTION CTA */}
-      <section className="py-24 bg-zinc-900/40 border-t border-zinc-900 px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h3 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100">
+      {/* 6. CALL TO ACTION */}
+      <section className="py-24 sm:py-32 border-t border-zinc-900 px-6 sm:px-8 text-center">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <h3 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
             Find the direction you are drawn to.
           </h3>
           <p className="text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Take the 24-question assessment, isolate your interest vs confidence signals, and receive an authentic roadmap.
+            Take the 24-question assessment, isolate your interest vs confidence signals, and uncover your authentic path.
           </p>
-          <div className="pt-4">
+          <div className="pt-2">
             <button
               onClick={() => onStartAssessment()}
-              className="px-9 py-4 rounded-full bg-zinc-100 text-zinc-950 hover:bg-white text-sm font-semibold tracking-tight transition-all shadow-xl hover:shadow-zinc-800/30 inline-flex items-center gap-2"
+              className="px-9 py-4 rounded-full bg-white text-black hover:bg-zinc-200 text-sm font-semibold tracking-tight transition-all shadow-xl inline-flex items-center gap-2"
             >
               <span>Begin Assessment</span>
               <ArrowRight className="w-4 h-4" />

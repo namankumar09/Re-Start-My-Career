@@ -173,3 +173,17 @@ export interface FeedbackSubmission {
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type SupportedLanguage = 'en' | 'hi';
+
+export interface AuthUser {
+  uid: string;
+  email?: string;
+  phoneNumber?: string;
+  displayName: string;
+  provider: 'google' | 'phone' | 'password';
+  photoURL?: string;
+  createdAt: string;
+  lastLoginAt: string;
+}
+
+export type AuthMode = 'signin' | 'signup' | 'forgot_password' | 'phone_otp';
+

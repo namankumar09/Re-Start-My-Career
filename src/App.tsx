@@ -10,10 +10,11 @@ import {
   AISettings, 
   ThemeMode, 
   SupportedLanguage, 
-  Segment, 
-  FeedbackSubmission 
+  Segment,
+  AuthUser 
 } from './types';
 import { StorageService } from './services/storage';
+import { AuthService } from './services/auth';
 import { generateRecommendations } from './services/assessmentEngine';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -28,9 +29,13 @@ import { OpportunitiesView } from './components/opportunities/OpportunitiesView'
 import { HelpFAQView } from './components/help/HelpFAQView';
 import { FeedbackView } from './components/feedback/FeedbackView';
 import { SettingsView } from './components/settings/SettingsView';
-import { DEMO_PROFILES, DemoAccount } from './data/demoProfiles';
+import { AuthView } from './components/auth/AuthView';
+import { DemoAccount } from './data/demoProfiles';
 
 export default function App() {
+  // Authentication State
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => AuthService.getCurrentUser());
+
   // Global App State with LocalStorage Persistence
   const [profile, setProfile] = useState<UserProfile | null>(() => StorageService.getProfile());
   const [answers, setAnswers] = useState<Record<string, number>>(() => StorageService.getAnswers());
@@ -63,7 +68,15 @@ export default function App() {
   const [onboardingInitialSegment, setOnboardingInitialSegment] = useState<Segment | undefined>(undefined);
   const [counsellorInitialQuery, setCounsellorInitialQuery] = useState<string | undefined>(undefined);
 
-  // Initialize theme on mount
+  // Subscribe to AuthService changes
+  useEffect(() => {
+    const unsubscribe = AuthService.subscribe((user) => {
+      setAuthUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Sync theme
   useEffect(() => {
     StorageService.saveTheme(theme);
   }, [theme]);
@@ -82,7 +95,7 @@ export default function App() {
   const handleOnboardingComplete = (newProfile: UserProfile) => {
     setProfile(newProfile);
     StorageService.saveProfile(newProfile);
-    // Reset answers if segment changed
+    // Reset answers if new profile created
     setAnswers({});
     setAssessmentIndex(0);
     StorageService.saveAnswers({});
@@ -159,6 +172,20 @@ export default function App() {
     setActiveTab('dashboard');
   };
 
+  // Handle Authentication Success
+  const handleAuthSuccess = (user: AuthUser) => {
+    setAuthUser(user);
+    const existing = StorageService.getProfile();
+    const synced = AuthService.syncProfileWithAuth(user, existing?.segment);
+    setProfile(synced);
+
+    if (result) {
+      setActiveTab('dashboard');
+    } else {
+      setActiveTab('landing');
+    }
+  };
+
   // Save / Bookmark Career Toggle
   const handleToggleSaveCareer = (rec: Recommendation) => {
     const exists = savedCareers.some((sc) => sc.careerId === rec.career.id);
@@ -230,6 +257,7 @@ export default function App() {
   // Data Export & Delete
   const handleExportData = () => {
     const fullData = {
+      authUser,
       profile,
       answers,
       result,
@@ -242,13 +270,23 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `restart_career_intelligence_${profile?.name?.toLowerCase().replace(/\s+/g, '_') || 'profile'}.json`;
+    a.download = `restart_career_record_${profile?.name?.toLowerCase().replace(/\s+/g, '_') || 'candidate'}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
+  // Real Account Sign Out
+  const handleSignOut = () => {
+    AuthService.logout();
+    setAuthUser(null);
+    setActiveTab('landing');
+  };
+
+  // Danger Zone - Purge all data
   const handleDeleteAllData = () => {
+    AuthService.logout();
     StorageService.clearAll();
+    setAuthUser(null);
     setProfile(null);
     setAnswers({});
     setAssessmentIndex(0);
@@ -260,12 +298,19 @@ export default function App() {
     setActiveTab('landing');
   };
 
-  const handleLogout = () => {
-    handleDeleteAllData();
-  };
+  // If Auth Screen is open, render isolated Apple-inspired Auth View
+  if (activeTab === 'auth') {
+    return (
+      <AuthView
+        onAuthSuccess={handleAuthSuccess}
+        onCancel={() => setActiveTab(result ? 'dashboard' : 'landing')}
+        language={language}
+      />
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans antialiased selection:bg-zinc-800 selection:text-white">
       
       {/* Top Apple-styled Navigation */}
       <Navbar
@@ -275,6 +320,7 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         profile={profile}
+        authUser={authUser}
         notifications={notifications}
         onMarkNotificationRead={handleMarkNotificationRead}
         onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
@@ -283,7 +329,8 @@ export default function App() {
         theme={theme}
         onChangeTheme={handleChangeTheme}
         onSelectDemoProfile={handleSelectDemoProfile}
-        onLogout={handleLogout}
+        onOpenAuth={() => setActiveTab('auth')}
+        onLogout={handleSignOut}
         hasAssessmentResult={!!result}
       />
 
@@ -400,13 +447,14 @@ export default function App() {
             }}
             onBack={() => setActiveTab(result ? 'dashboard' : 'landing')}
             language={language}
-            userEmail={profile?.email}
+            userEmail={profile?.email || authUser?.email}
           />
         )}
 
         {activeTab === 'settings' && (
           <SettingsView
             profile={profile}
+            authUser={authUser}
             notificationSettings={notificationSettings}
             onUpdateNotificationSettings={(s) => {
               setNotificationSettings(s);
@@ -423,36 +471,37 @@ export default function App() {
             onChangeLanguage={handleChangeLanguage}
             onExportData={handleExportData}
             onDeleteAllData={handleDeleteAllData}
+            onSignOut={handleSignOut}
           />
         )}
 
         {activeTab === 'privacy' && (
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-6">
-            <h1 className="font-heading text-3xl font-bold text-zinc-100">
-              Privacy Architecture & Governance
+          <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
+            <h1 className="text-3xl font-bold tracking-tight text-white">
+              Privacy Architecture
             </h1>
-            <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-4 text-xs text-zinc-300 leading-relaxed">
+            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4 text-xs text-zinc-400 leading-relaxed">
               <p>
-                re\start my career operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored exclusively to generate your personalized career intelligence report.
+                Re\Start My Career operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored securely to generate your personalized career intelligence report.
               </p>
               <p>
-                Optional demographic indicators (such as reservation status and annual family income) are strictly utilized to compute eligibility for Indian central, state, and corporate educational scholarships. They are never shared or sold to external third-party test prep institutes or coaching monopolies.
+                Optional demographic indicators are strictly utilized to compute eligibility for Indian central, state, and corporate educational scholarships. They are never shared or sold to external third-party coaching institutes.
               </p>
             </div>
           </div>
         )}
 
         {activeTab === 'terms' && (
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-6">
-            <h1 className="font-heading text-3xl font-bold text-zinc-100">
-              Terms of Service (Prototype Notice)
+          <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
+            <h1 className="text-3xl font-bold tracking-tight text-white">
+              Terms of Service
             </h1>
-            <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 space-y-4 text-xs text-zinc-300 leading-relaxed">
+            <div className="p-8 rounded-2xl bg-zinc-950 border border-zinc-900 space-y-4 text-xs text-zinc-400 leading-relaxed">
               <p>
-                re\start my career is a career intelligence, self-discovery, and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
+                Re\Start My Career is a career intelligence and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
               </p>
               <p>
-                The outputs generated are intended for directional educational guidance and exploration. They do not constitute psychological, psychiatric, or diagnostic evaluation, nor an infallible guarantee of examination outcomes or admission offers.
+                The outputs generated are intended for directional educational guidance and exploration. They do not constitute psychological, psychiatric, or diagnostic evaluation.
               </p>
             </div>
           </div>

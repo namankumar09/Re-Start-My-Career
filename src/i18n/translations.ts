@@ -3,28 +3,28 @@ import { SupportedLanguage } from '../types';
 export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
   en: {
     // Brand & Header
-    brand_name: 're\\start my career',
+    brand_name: 'Re\\Start My Career',
     tagline: 'Find the direction you are drawn to. Then find the path to actually get there.',
-    nav_dashboard: 'Dashboard',
+    nav_dashboard: 'Careers',
     nav_assessment: 'Assessment',
     nav_report: 'Report',
     nav_saved_careers: 'Saved Careers',
-    nav_counsellor: 'AI Counsellor',
+    nav_counsellor: 'Counsellor',
     nav_opportunities: 'Opportunities',
     nav_feedback: 'Feedback',
     nav_help: 'Help / FAQ',
     nav_settings: 'Settings',
-    nav_demo_mode: 'Demo Personas',
+    nav_demo_mode: 'Demo',
     nav_login: 'Sign In',
     nav_logout: 'Sign Out',
     
     // Landing
     hero_statement_1: "You don't need more career advice.",
     hero_statement_2: 'You need a clearer signal.',
-    hero_supporting: 're\\start my career separates what pulls you from what you believe you’re capable of — then turns that difference into an actionable career path.',
-    cta_find_direction: 'Find my direction',
-    cta_see_how: 'See how it works',
-    cta_try_demo: 'Explore with Demo Persona',
+    hero_supporting: 'Re\\Start My Career separates what pulls you from what you merely learned to tolerate — mapping your true psychometric profile to viable Indian educational and professional pathways.',
+    cta_find_direction: 'Take Assessment',
+    cta_see_how: 'See How It Works',
+    cta_try_demo: 'Try Demo Profile',
 
     // Problem & Signal
     section_problem_title: 'The Problem',
@@ -35,11 +35,11 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
 
     // Three Moments
     segment_01_title: '01 — Career Switch',
-    segment_01_desc: 'For people already working who are considering a different direction or escaping workplace burnout.',
+    segment_01_desc: 'For working professionals seeking a reliable, structured pathway into a new domain.',
     segment_02_title: '02 — Class 12',
-    segment_02_desc: 'Choose your undergraduate degree, entrance exam focus, or professional trajectory with grounded reality.',
+    segment_02_desc: 'Choose undergraduate degree programs, entrance exams, and allied fields with clarity.',
     segment_03_title: '03 — Class 10',
-    segment_03_desc: 'Choose your academic stream (PCM, PCB, Commerce, Humanities) based on intrinsic curiosity.',
+    segment_03_desc: 'Select your 11th grade stream (PCM, PCB, Commerce, Humanities) based on authentic curiosity.',
 
     // Assessment UI
     question_indicator: 'Question',
@@ -83,14 +83,14 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     btn_remove: 'Remove',
 
     // AI Counsellor
-    ai_title: 'AI Career Counsellor',
+    ai_title: 'Career Counsellor',
     ai_subtitle: 'Evidence-grounded dialogue referencing your exact RIASEC scores, gaps, and Indian pathway realities.',
     ai_placeholder: 'Ask about degree alternatives, parent conversations, or transition risks...',
     btn_send: 'Send',
     ai_fallback_notice: 'Offline mode active: Answers are generated from your verified assessment data.',
 
     // Settings
-    settings_title: 'System Preferences',
+    settings_title: 'Settings',
     appearance_label: 'Appearance',
     language_label: 'Language',
     ai_config_label: 'AI Service Architecture',
@@ -100,28 +100,28 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
   },
   hi: {
     // Brand & Header
-    brand_name: 're\\start my career',
+    brand_name: 'Re\\Start My Career',
     tagline: 'वह दिशा खोजें जो आपको आकर्षित करती है। फिर वहां तक पहुंचने का वास्तविक मार्ग खोजें।',
-    nav_dashboard: 'डैशबोर्ड',
+    nav_dashboard: 'करियर',
     nav_assessment: 'मूल्यांकन',
     nav_report: 'रिपोर्ट',
     nav_saved_careers: 'सहेजे गए करियर',
-    nav_counsellor: 'AI परामर्शदाता',
+    nav_counsellor: 'परामर्शदाता',
     nav_opportunities: 'छात्रवृत्तियां व योजनाएं',
     nav_feedback: 'प्रतिक्रिया',
     nav_help: 'सहायता / प्रश्नोत्तरी',
     nav_settings: 'सेटिंग्स',
-    nav_demo_mode: 'डेमो प्रोफाइल',
+    nav_demo_mode: 'डेमो',
     nav_login: 'लॉग इन करें',
     nav_logout: 'लॉग आउट',
 
     // Landing
     hero_statement_1: 'आपको केवल करियर सलाह नहीं चाहिए।',
     hero_statement_2: 'आपको एक स्पष्ट और सटीक संकेत चाहिए।',
-    hero_supporting: 're\\start my career आपकी वास्तविक रुचि और आपके आत्मविश्वास के बीच के अंतर को पहचानता है — और उसे एक ठोस करियर मार्ग में बदलता है।',
-    cta_find_direction: 'मेरी दिशा खोजें',
+    hero_supporting: 'Re\\Start My Career आपकी वास्तविक रुचि और आपके आत्मविश्वास के बीच के अंतर को पहचानता है — और उसे एक ठोस करियर मार्ग में बदलता है।',
+    cta_find_direction: 'मूल्यांकन शुरू करें',
     cta_see_how: 'देखें यह कैसे काम करता है',
-    cta_try_demo: 'डेमो प्रोफाइल से देखें',
+    cta_try_demo: 'डेमो प्रोफाइल देखें',
 
     // Problem & Signal
     section_problem_title: 'मूल समस्या',
@@ -180,14 +180,14 @@ export const TRANSLATIONS: Record<SupportedLanguage, Record<string, string>> = {
     btn_remove: 'हटाएं',
 
     // AI Counsellor
-    ai_title: 'AI करियर परामर्शदाता',
+    ai_title: 'करियर परामर्शदाता',
     ai_subtitle: 'आपके वास्तविक अंकों, रुचि-अंतर और भारतीय शिक्षा प्रणाली के आधार पर सीधा संवाद।',
     ai_placeholder: 'डिग्री विकल्प, माता-पिता से बातचीत या करियर जोखिम के बारे में पूछें...',
     btn_send: 'भेजें',
     ai_fallback_notice: 'ऑफ़लाइन मोड सक्रिय: उत्तर आपके सत्यापित मूल्यांकन डेटा से दिए जा रहे हैं।',
 
     // Settings
-    settings_title: 'सिस्टम प्राथमिकताएं',
+    settings_title: 'सेटिंग्स',
     appearance_label: 'दिखावट (थीम)',
     language_label: 'भाषा',
     ai_config_label: 'AI सेवा संरचना',
