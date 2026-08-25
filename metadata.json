@@ -1,0 +1,6 @@
+{
+  "name": "Re\\Start my Career",
+  "description": "Premium career counselling platform with Holland RIASEC profiling, interest vs. confidence gap analysis, and tailored Indian educational pathways.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
