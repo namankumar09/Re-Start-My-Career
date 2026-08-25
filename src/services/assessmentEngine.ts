@@ -180,60 +180,89 @@ export function generateRecommendations(
   result: AssessmentResult,
   profile: UserProfile
 ): Recommendation[] {
-  const { scores, topDimensions, segment } = result;
+  const { scores, segment } = result;
 
   // Filter and score careers from database
-  const scoredCareers: { career: Career; fitScore: number }[] = CAREER_DATABASE.map((career) => {
-    let fit = 0;
+  const scoredCareers: { career: Career; fitScore: number }[] = [];
 
-    // Segment compatibility
-    const segmentMatch = career.segments.includes(segment);
-    if (!segmentMatch) {
-      fit -= 25;
+  CAREER_DATABASE.forEach((career) => {
+    // 1. Strict segment compatibility
+    if (!career.segments.includes(segment)) {
+      return; // Skip careers not meant for this stage
     }
 
-    // Primary dimension alignment
+    let fit = 0;
+    let totalWeight = 0;
+
+    // 2. Primary dimension alignment
     career.primaryDimensions.forEach((dim) => {
-      const dimScore = scores[dim]?.interestScore || 50;
-      const confScore = scores[dim]?.confidenceScore || 50;
-      fit += (dimScore * 0.45) + (confScore * 0.15);
+      const dimData = scores[dim];
+      const interest = dimData?.interestScore || 50;
+      const confidence = dimData?.confidenceScore || 50;
+      
+      // Interest is weighted more heavily than confidence
+      fit += (interest * 0.7) + (confidence * 0.3);
+      totalWeight += 1;
     });
 
-    // Secondary dimension alignment
+    // 3. Secondary dimension alignment
     career.secondaryDimensions.forEach((dim) => {
-      const dimScore = scores[dim]?.interestScore || 50;
-      fit += (dimScore * 0.20);
+      const dimData = scores[dim];
+      const interest = dimData?.interestScore || 50;
+      const confidence = dimData?.confidenceScore || 50;
+      
+      fit += ((interest * 0.7) + (confidence * 0.3)) * 0.5;
+      totalWeight += 0.5;
     });
 
-    // Career switch specific adjustments
+    let avgFit = fit / totalWeight;
+
+    // 4. Gap Adjustments
+    let hasLatentGap = false;
+    career.primaryDimensions.forEach((dim) => {
+      if (scores[dim]?.classification === 'Latent') {
+        hasLatentGap = true;
+        avgFit += 3; // Boost slightly to encourage exploring latent interests
+      }
+    });
+
+    // 5. Life Stage & Financial Context
     if (segment === 'career_switch') {
       if (profile.incomeDependency === 'I am the primary earner') {
         if (career.isIncomePreservingFriendly) {
-          fit += 15; // Prioritize low-risk bridge transitions
+          avgFit += 8;
         } else if (career.riskLevel === 'High') {
-          fit -= 20; // Penalize 5-year full-time degrees with no income
+          avgFit -= 15;
         }
       } else if (profile.incomeDependency === 'No one') {
         if (career.riskLevel === 'High' || career.transitionType === 'Higher-flexibility transition') {
-          fit += 10; // Encourage ambitious pivots
+          avgFit += 5;
         }
       }
 
-      if (profile.switchReason === 'Burnout') {
-        // Boost careers with structured hours or healthy boundaries
-        if (career.riskLevel === 'Low') {
-          fit += 5;
+      if (profile.switchReason === 'Burnout' && career.riskLevel === 'Low') {
+        avgFit += 5;
+      }
+      
+      if (profile.age) {
+        if (profile.age >= 40) {
+          if (career.timeToEntry.includes('months') || career.timeToEntry.includes('1 year')) avgFit += 12;
+          if (career.isIncomePreservingFriendly) avgFit += 8;
+        } else if (profile.age >= 35) {
+          if (career.timeToEntry.includes('1-2 years') || career.timeToEntry.includes('months')) avgFit += 8;
+        } else if (profile.age >= 30) {
+          if (career.timeToEntry.includes('4-6 years') || career.timeToEntry.includes('5.5')) avgFit -= 10;
         }
       }
     }
 
-    // Normalize fit to 60-98 range
-    const normalizedFit = Math.min(97, Math.max(52, Math.round(fit / (career.primaryDimensions.length + career.secondaryDimensions.length * 0.5) * 1.05)));
+    // Normalize to 60-98 range for UI aesthetic
+    const normalizedFit = Math.min(98, Math.max(60, Math.round(avgFit)));
 
-    return {
+    scoredCareers.push({
       career,
       fitScore: normalizedFit,
-    };
+    });
   });
 
   // Sort descending by fitScore
@@ -243,28 +272,21 @@ export function generateRecommendations(
   const topList = scoredCareers.slice(0, 5);
 
   return topList.map(({ career, fitScore }) => {
-    const primDim = career.primaryDimensions?.[0] || 'Investigative';
-    const secDim = career.secondaryDimensions?.[0] || 'Conventional';
-    const tertDim = career.secondaryDimensions?.[1] || 'Realistic';
-
-    const pScore = scores[primDim]?.interestScore || 80;
-    const sScore = scores[secDim]?.interestScore || 70;
-    const tScore = scores[tertDim]?.interestScore || 30;
-
-    const reasoningChain = `${primDim} ${pScore} + ${secDim} ${sScore} + ${tertDim} ${tScore} → ${career.title}`;
-
-    let transitionLabel: string | undefined;
-    if (segment === 'career_switch') {
-      if (profile.incomeDependency === 'I am the primary earner' && career.isIncomePreservingFriendly) {
-        transitionLabel = 'Income-preserving transition';
-      } else if (profile.incomeDependency === 'No one') {
-        transitionLabel = 'Higher-flexibility transition';
-      } else {
-        transitionLabel = career.transitionType || 'Structured path';
-      }
+    const primDim = career.primaryDimensions[0];
+    const pScore = scores[primDim];
+    
+    let whyThis = '';
+    if (pScore?.classification === 'Latent') {
+      whyThis = `You have a strong latent interest in ${primDim} (${pScore.interestScore}%), but your confidence is currently lower (${pScore.confidenceScore}%). This pathway is recommended because it matches what you actually want to do. Don't let current confidence hold you back—skills can be built.`;
+    } else if (pScore?.classification === 'Overbuilt') {
+      whyThis = `While you are highly confident in ${primDim}, your interest is lower. This pathway leverages your existing capabilities, but you should ensure the day-to-day reality aligns with your actual interests.`;
+    } else {
+      const secDim = career.secondaryDimensions[0];
+      const sScore = scores[secDim];
+      whyThis = `Your ${primDim} interest (${pScore?.interestScore}%) combined with your ${secDim} interest (${sScore?.interestScore}%) creates a strong natural alignment for this pathway. Your confidence scores also indicate you feel capable of executing this transition.`;
     }
 
-    const whyThis = `Your ${primDim} score of ${pScore} indicates a strong natural orientation toward ${getDimensionTrait(primDim)}. Combined with your ${secDim} score of ${sScore} (${getDimensionTrait(secDim)}), this pathway leverages your strengths while keeping procedural friction manageable.`;
+    const reasoningChain = `${primDim} (Int: ${pScore?.interestScore}, Conf: ${pScore?.confidenceScore}) → ${career.title}`;
 
     return {
       career,
@@ -276,7 +298,7 @@ export function generateRecommendations(
       indianExams: career.exams,
       institutions: career.institutions,
       estimatedDuration: career.timeToEntry,
-      transitionLabel,
+      transitionLabel: career.transitionType || 'Structured path',
     };
   });
 }

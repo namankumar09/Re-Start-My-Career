@@ -6,17 +6,15 @@ import {
   Info,
   CheckCircle2
 } from 'lucide-react';
-import { ReservationCategory } from '../../types';
+import { UserProfile, ReservationCategory } from '../../types';
 import { SCHOLARSHIPS_DATA } from '../../data/scholarships';
 
 interface OpportunitiesViewProps {
-  userCategory?: ReservationCategory;
-  userIncome?: string;
+  profile: UserProfile | null;
 }
 
 export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
-  userCategory,
-  userIncome,
+  profile,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -36,7 +34,28 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
     // Type match
     const matchesType = selectedType === 'All' || opp.type === selectedType;
 
-    return matchesSearch && matchesCat && matchesType;
+    // Strict Personalization Filtering based on Profile
+    let personalizationMatch = true;
+    if (profile) {
+      // If the scholarship explicitly lists category matches and doesn't have 'General', 
+      // ensure the user fits the category.
+      if (opp.categoryMatch.length > 0 && !opp.categoryMatch.includes('General')) {
+        if (!profile.reservationCategory || !opp.categoryMatch.includes(profile.reservationCategory)) {
+          personalizationMatch = false;
+        }
+      }
+
+      // If the user's income is explicitly provided, filter out scholarships that are exclusively for lower brackets
+      // (This is a simplified check - in reality you'd parse income brackets, but we can do string matching based on the known bracket values)
+      if (profile.annualFamilyIncome === '₹8 Lakhs - ₹15 Lakhs' || profile.annualFamilyIncome === 'Above ₹15 Lakhs') {
+        // e.g. EWS scholarships generally require < 8L
+        if (opp.categoryMatch.includes('EWS') && !opp.categoryMatch.includes('General')) {
+          personalizationMatch = false;
+        }
+      }
+    }
+
+    return matchesSearch && matchesCat && matchesType && personalizationMatch;
   });
 
   return (
@@ -64,7 +83,7 @@ export const OpportunitiesView: React.FC<OpportunitiesViewProps> = ({
         <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-start gap-3 text-xs text-zinc-700 dark:text-zinc-300">
           <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            Scholarships and reservation criteria are provided purely for financial feasibility planning. PathFind recommendations are strictly psychometric and are never narrowed based on socioeconomic background.
+            Scholarships and reservation criteria are provided purely for financial feasibility planning. Re\Start My Career recommendations are strictly psychometric and are never narrowed based on socioeconomic background.
           </p>
         </div>
 

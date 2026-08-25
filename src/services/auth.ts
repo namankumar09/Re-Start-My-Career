@@ -65,33 +65,64 @@ export class AuthService {
   /**
    * Real Google Authentication Flow
    */
-  static async signInWithGoogle(customEmail?: string, customName?: string): Promise<AuthUser> {
-    // Simulate brief network authentication latency
-    await new Promise((resolve) => setTimeout(resolve, 450));
+  static async signInWithGoogle(): Promise<AuthUser> {
+    try {
+      const response = await fetch(`/api/auth/google/url?origin=${encodeURIComponent(window.location.origin)}`);
+      if (!response.ok) {
+        throw new Error('Failed to get auth URL. Check API configuration.');
+      }
+      const { url } = await response.json();
 
-    const email = customEmail || 'namannavin0907@gmail.com';
-    const displayName = customName || email.split('@')[0].replace(/[0-9.]/g, ' ').trim() || 'Candidate';
-    const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-    const uid = 'google_' + btoa(email).replace(/=/g, '').slice(0, 16);
+      return new Promise((resolve, reject) => {
+        const authWindow = window.open(url, 'oauth_popup', 'width=600,height=700');
+        if (!authWindow) {
+          reject(new Error('Please allow popups to connect your Google account.'));
+          return;
+        }
 
-    const user: AuthUser = {
-      uid,
-      email,
-      displayName: formattedName,
-      provider: 'google',
-      photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(formattedName)}&backgroundColor=18181b&textColor=ffffff`,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-    };
+        const handleMessage = (event: MessageEvent) => {
+          if (!event.origin.endsWith('.run.app') && !event.origin.includes('localhost')) {
+            return;
+          }
 
-    // Store in registered accounts
-    const accounts = this.getRegisteredAccounts();
-    accounts[user.uid] = { user };
-    this.saveRegisteredAccounts(accounts);
+          if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+            window.removeEventListener('message', handleMessage);
+            const { email, name, picture } = event.data.payload;
+            
+            const uid = 'google_' + btoa(email).replace(/=/g, '').slice(0, 16);
+            
+            const user: AuthUser = {
+              uid,
+              email,
+              displayName: name,
+              provider: 'google',
+              photoURL: picture || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=18181b&textColor=ffffff`,
+              createdAt: new Date().toISOString(),
+              lastLoginAt: new Date().toISOString(),
+            };
 
-    this.saveCurrentUser(user);
-    this.syncProfileWithAuth(user);
-    return user;
+            const accounts = this.getRegisteredAccounts();
+            accounts[user.uid] = { user };
+            this.saveRegisteredAccounts(accounts);
+            this.saveCurrentUser(user);
+            this.syncProfileWithAuth(user);
+            resolve(user);
+          }
+        };
+
+        window.addEventListener('message', handleMessage);
+
+        const checkClosed = setInterval(() => {
+          if (authWindow.closed) {
+            clearInterval(checkClosed);
+            window.removeEventListener('message', handleMessage);
+            reject(new Error('Sign-in cancelled'));
+          }
+        }, 500);
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**

@@ -94,16 +94,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-black/80 border-b border-zinc-200 dark:border-zinc-800/80 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
         
-        {/* Requirement 1: Clickable PathFind Logo */}
+        {/* Requirement 1: Clickable Re\Start My Career Logo */}
         <div className="flex items-center gap-3">
           <button
             onClick={handleLogoClick}
-            aria-label="PathFind Home"
+            aria-label="Re\Start My Career Home"
             className="flex items-center gap-2.5 text-left transition-opacity hover:opacity-80 focus:outline-none cursor-pointer group"
           >
             <BrandLogo className="h-6 sm:h-7 w-auto text-zinc-900 dark:text-white transition-transform group-hover:scale-105" />
             <span className="font-semibold text-sm sm:text-base tracking-tight text-zinc-900 dark:text-white">
-              PathFind
+              Re\Start My Career
             </span>
           </button>
         </div>
@@ -420,7 +420,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           <div className="text-center text-xs text-zinc-400 pt-6">
-            PathFind · Career Guidance & Pathways
+            Re\Start My Career · Career Guidance & Pathways
           </div>
         </div>
       )}

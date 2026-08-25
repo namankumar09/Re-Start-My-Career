@@ -145,7 +145,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
         <div className="flex items-center gap-2.5">
           <BrandLogo className="h-6 sm:h-7 w-auto text-zinc-950 dark:text-white" />
           <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">
-            PathFind
+            Re\Start My Career
           </span>
         </div>
 
@@ -571,7 +571,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
 
       {/* Footer Note */}
       <footer className="w-full py-6 text-center text-xs text-zinc-500 dark:text-zinc-400 border-t border-zinc-100 dark:border-zinc-900">
-        PathFind · Secure Candidate Authentication & Data Sovereignty
+        Re\Start My Career · Secure Candidate Authentication & Data Sovereignty
       </footer>
 
     </div>

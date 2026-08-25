@@ -42,7 +42,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       name: 'Aarav Sharma',
       role: 'Class 10 Student · CBSE',
       avatarInitial: 'A',
-      quote: 'I was pushed toward generic JEE coaching because my math marks were high. PathFind showed my true interest was in Investigative & Applied Robotics — steering me toward Mechatronics without second-guessing.',
+      quote: 'I was pushed toward generic JEE coaching because my math marks were high. Re\Start My Career showed my true interest was in Investigative & Applied Robotics — steering me toward Mechatronics without second-guessing.',
       tag: 'Stream Discovery',
       metric: 'IR Profile (Investigative-Realistic)'
     },
@@ -72,7 +72,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       name: 'Pooja Verma',
       role: 'Financial Operations → Business Intelligence',
       avatarInitial: 'P',
-      quote: 'As the primary household earner, I couldn’t quit my job to restart college. PathFind filtered solely for income-preserving upskilling pathways, leading directly to a senior Risk & BI analyst role.',
+      quote: 'As the primary household earner, I couldn’t quit my job to restart college. Re\Start My Career filtered solely for income-preserving upskilling pathways, leading directly to a senior Risk & BI analyst role.',
       tag: 'Income-Preserving Switch',
       metric: 'IC Profile (Investigative-Conventional)'
     },
@@ -100,7 +100,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* Supporting Copy */}
         <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed mb-10">
-          PathFind isolates what naturally pulls your curiosity from what you merely learned to tolerate — mapping your true psychometric profile to viable Indian educational and professional pathways.
+          Re\Start My Career isolates what naturally pulls your curiosity from what you merely learned to tolerate — mapping your true psychometric profile to viable Indian educational and professional pathways.
         </p>
 
         {/* Action Buttons */}

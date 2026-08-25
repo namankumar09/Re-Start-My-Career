@@ -15,7 +15,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab }) => {
           <div className="flex items-center gap-2.5">
             <BrandLogo className="h-5 sm:h-6 w-auto text-zinc-900 dark:text-white" />
             <span className="font-semibold text-sm text-zinc-900 dark:text-white tracking-tight">
-              PathFind
+              Re\Start My Career
             </span>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-xs leading-relaxed max-w-xs">
@@ -103,7 +103,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab }) => {
       {/* Disclaimers & Copyright */}
       <div className="max-w-7xl mx-auto pt-8 border-t border-zinc-200 dark:border-zinc-900 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-400">
         <p>
-          PathFind · Psychometric signal modeling for Indian career & educational pathways.
+          Re\Start My Career · Psychometric signal modeling for Indian career & educational pathways.
         </p>
         <p className="text-center md:text-right">
           Career guidance system. All psychometric calculations run deterministically.

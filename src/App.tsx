@@ -42,6 +42,7 @@ export default function App() {
   const [answers, setAnswers] = useState<Record<string, number>>(() => StorageService.getAnswers());
   const [assessmentIndex, setAssessmentIndex] = useState<number>(() => StorageService.getAssessmentIndex());
   const [result, setResult] = useState<AssessmentResult | null>(() => StorageService.getResult());
+  const [aiAnalysis, setAiAnalysis] = useState<any>(() => StorageService.getAiAnalysis());
   const [recommendations, setRecommendations] = useState<Recommendation[]>(() => {
     const savedRecs = StorageService.getRecommendations();
     if (savedRecs.length > 0) return savedRecs;
@@ -64,6 +65,8 @@ export default function App() {
     if (StorageService.getResult()) return 'dashboard';
     return 'landing';
   });
+  
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const [onboardingInitialSegment, setOnboardingInitialSegment] = useState<Segment | undefined>(undefined);
   const [counsellorInitialQuery, setCounsellorInitialQuery] = useState<string | undefined>(undefined);
@@ -72,6 +75,19 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = AuthService.subscribe((user) => {
       setAuthUser(user);
+      
+      // Reload user-specific data from storage
+      setProfile(StorageService.getProfile());
+      setAnswers(StorageService.getAnswers());
+      setAssessmentIndex(StorageService.getAssessmentIndex());
+      setResult(StorageService.getResult());
+      setAiAnalysis(StorageService.getAiAnalysis());
+      setRecommendations(StorageService.getRecommendations());
+      setSavedCareers(StorageService.getSavedCareers());
+      setChatHistory(StorageService.getChatHistory());
+      setNotifications(StorageService.getNotifications());
+      setNotificationSettings(StorageService.getNotificationSettings());
+      setAiSettings(StorageService.getAISettings());
     });
     return () => unsubscribe();
   }, []);
@@ -129,17 +145,18 @@ export default function App() {
   };
 
   // Complete Assessment
-  const handleAssessmentComplete = (newResult: AssessmentResult, finalAnswers: Record<string, number>) => {
+  const handleAssessmentComplete = async (newResult: AssessmentResult, finalAnswers: Record<string, number>) => {
     setResult(newResult);
     StorageService.saveResult(newResult);
     StorageService.saveAnswers(finalAnswers);
 
+    // Provide immediate local fallback first
     if (profile) {
       const recs = generateRecommendations(newResult, profile);
       setRecommendations(recs);
       StorageService.saveRecommendations(recs);
     }
-
+    
     // Add completion notification
     const completionNotif: AppNotification = {
       id: 'notif_complete_' + Date.now(),
@@ -152,9 +169,33 @@ export default function App() {
     const updatedNotifs = [completionNotif, ...notifications];
     setNotifications(updatedNotifs);
     StorageService.saveNotifications(updatedNotifs);
-
+    
     setActiveTab('report');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Call Gemini for structured AI analysis
+    if (profile) {
+      setIsAnalyzing(true);
+      try {
+        const response = await fetch('/api/ai/analyze-assessment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile, answers: finalAnswers, result: newResult, recommendations: recs })
+        });
+        
+        if (response.ok) {
+          const aiData = await response.json();
+          // We can merge AI data into recommendations or store it.
+          // For now we'll store the AI roadmap/summary in localStorage and update state
+          StorageService.saveAiAnalysis(aiData);
+          setAiAnalysis(aiData);
+        }
+      } catch (error) {
+        console.error('Failed to analyze assessment via Gemini', error);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    }
   };
 
   // Load a 1-Click Evaluation Demo Persona
@@ -260,8 +301,15 @@ export default function App() {
   const handleRetakeAssessment = () => {
     setAnswers({});
     setAssessmentIndex(0);
+    setResult(null);
+    setAiAnalysis(null);
+    setRecommendations([]);
     StorageService.saveAnswers({});
     StorageService.saveAssessmentIndex(0);
+    const storageSvc = StorageService as any;
+    localStorage.removeItem(storageSvc.getKey?.('restart_assessment_result') || 'restart_assessment_result');
+    localStorage.removeItem(storageSvc.getKey?.('restart_ai_analysis') || 'restart_ai_analysis');
+    localStorage.removeItem(storageSvc.getKey?.('restart_recommendations') || 'restart_recommendations');
     setActiveTab('assessment');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -412,6 +460,8 @@ export default function App() {
             result={result}
             profile={profile}
             recommendations={recommendations}
+            aiAnalysis={aiAnalysis}
+            isAnalyzing={isAnalyzing}
             savedCareerIds={savedCareers.map((sc) => sc.careerId)}
             onToggleSaveCareer={handleToggleSaveCareer}
             onOpenAICounsellor={() => handleOpenAICounsellor()}
@@ -459,8 +509,7 @@ export default function App() {
 
         {activeTab === 'opportunities' && (
           <OpportunitiesView
-            userCategory={profile?.reservationCategory}
-            userIncome={profile?.annualFamilyIncome}
+            profile={profile}
           />
         )}
 
@@ -507,7 +556,7 @@ export default function App() {
             </h1>
             <div className="p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 space-y-4 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed shadow-sm">
               <p>
-                PathFind operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored securely to generate your personalized career intelligence report.
+                Re\Start My Career operates under strict data sovereignty principles. Your psychometric responses, Interest vs Confidence signals, and life stage details are stored securely to generate your personalized career intelligence report.
               </p>
               <p>
                 Optional demographic indicators are strictly utilized to compute eligibility for Indian central, state, and corporate educational scholarships. They are never shared or sold to external third-party coaching institutes.
@@ -523,7 +572,7 @@ export default function App() {
             </h1>
             <div className="p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-900 space-y-4 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed shadow-sm">
               <p>
-                PathFind is a career intelligence and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
+                Re\Start My Career is a career intelligence and pathway modeling platform based on the Holland RIASEC psychometric framework and Indian higher education entrance datasets.
               </p>
               <p>
                 The outputs generated are intended for directional educational guidance and exploration. They do not constitute psychological, psychiatric, or diagnostic evaluation.

@@ -29,6 +29,8 @@ interface ReportViewProps {
   result: AssessmentResult;
   profile: UserProfile;
   recommendations: Recommendation[];
+  aiAnalysis?: any;
+  isAnalyzing?: boolean;
   savedCareerIds: string[];
   onToggleSaveCareer: (career: Recommendation) => void;
   onOpenAICounsellor: () => void;
@@ -39,6 +41,8 @@ export const ReportView: React.FC<ReportViewProps> = ({
   result,
   profile,
   recommendations,
+  aiAnalysis,
+  isAnalyzing,
   savedCareerIds,
   onToggleSaveCareer,
   onOpenAICounsellor,
@@ -138,6 +142,104 @@ export const ReportView: React.FC<ReportViewProps> = ({
         {/* ========================================================================= */}
         {audienceMode === 'for_you' && (
           <div className="space-y-16 animate-in fade-in duration-200">
+          
+            {/* AI Career Intelligence */}
+            {isAnalyzing && (
+              <div className="p-8 md:p-12 rounded-3xl border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center space-y-4 bg-zinc-50 dark:bg-zinc-900 shadow-sm">
+                <div className="w-8 h-8 rounded-full border-2 border-zinc-300 dark:border-zinc-700 border-t-zinc-900 dark:border-t-white animate-spin" />
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Generating AI Career Intelligence...</h3>
+                <p className="text-xs text-zinc-500 text-center max-w-sm">
+                  Gemini is analyzing your psychometric profile, age, and background to build your personalized roadmap.
+                </p>
+              </div>
+            )}
+
+            {!isAnalyzing && aiAnalysis && (
+              <div className="p-8 md:p-12 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black space-y-12 shadow-sm">
+                <header className="space-y-4">
+                  <div className="inline-flex items-center space-x-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-medium tracking-wide uppercase rounded-full">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Your AI Career Analysis</span>
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+                    Personalized Career Intelligence
+                  </h2>
+                  <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400 max-w-3xl leading-relaxed">
+                    {aiAnalysis.profile_summary}
+                  </p>
+                </header>
+
+                <div className="space-y-8">
+                  <h3 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white flex items-center">
+                    Top Career Matches
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    {aiAnalysis.top_careers?.map((c: any, i: number) => (
+                      <div key={i} className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-4">
+                        <div className="flex justify-between items-start">
+                          <h4 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{c.career}</h4>
+                          <span className="text-xs font-bold px-2 py-1 bg-zinc-200 dark:bg-zinc-800 rounded-full text-zinc-900 dark:text-zinc-100">{c.match_score}% Match</span>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 block mb-1">Why This Fits You</span>
+                            <ul className="text-sm text-zinc-700 dark:text-zinc-300 space-y-1 list-disc pl-4">
+                              {c.why_match?.map((w: string, idx: number) => <li key={idx}>{w}</li>)}
+                            </ul>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-500 block mb-1">Existing Skills / Strengths</span>
+                              <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1 list-disc pl-4">
+                                {[...(c.strengths || []), ...(c.existing_skills || [])].map((s: string, idx: number) => <li key={idx}>{s}</li>)}
+                              </ul>
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-500 block mb-1">Your Skill Gaps</span>
+                              <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1 list-disc pl-4">
+                                {c.skill_gaps?.map((g: string, idx: number) => <li key={idx}>{g}</li>)}
+                              </ul>
+                            </div>
+                          </div>
+                          
+                          {c.next_steps && c.next_steps.length > 0 && (
+                            <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-500 block mb-1">Recommended Next Steps</span>
+                              <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-1 list-disc pl-4">
+                                {c.next_steps?.map((g: string, idx: number) => <li key={idx}>{g}</li>)}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-8 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+                  <h3 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white flex items-center">
+                    Your Career Roadmap
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {[
+                      { label: 'Now', items: aiAnalysis.roadmap?.now },
+                      { label: 'Next 3 Months', items: aiAnalysis.roadmap?.three_months },
+                      { label: '3-6 Months', items: aiAnalysis.roadmap?.six_months },
+                      { label: '6-12 Months', items: aiAnalysis.roadmap?.twelve_months }
+                    ].map((phase, i) => (
+                      <div key={i} className="space-y-3">
+                        <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 border-b border-zinc-200 dark:border-zinc-800 pb-2">{phase.label}</h4>
+                        <ul className="text-xs text-zinc-600 dark:text-zinc-400 space-y-2 list-disc pl-3">
+                          {phase.items?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
             
             {/* 1. HEADLINE */}
             <div className="space-y-3 pt-4">
@@ -795,7 +897,7 @@ function generateParentReportText(
   profile: UserProfile,
   recommendations: Recommendation[]
 ): string {
-  return `PathFind — Family Career Direction Summary
+  return `Re\\Start My Career — Family Career Direction Summary
 Student: ${profile.name} (${profile.age} years old)
 Stage: ${profile.segment.replace('_', ' ').toUpperCase()}
 Holland RIASEC Profile: ${result.hollandCode} (${result.topDimensions.join(', ')})

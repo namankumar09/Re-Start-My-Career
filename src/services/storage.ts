@@ -63,9 +63,29 @@ export const defaultNotifications: AppNotification[] = [
 
 // LocalStorage persistence manager
 export class StorageService {
+  private static getUserId(): string {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN); // Wait, this key is wrong. The auth service uses 'restart_auth_user'
+      // Let's hardcode the correct one directly to avoid circular imports.
+      const authData = localStorage.getItem('restart_auth_user');
+      if (authData) {
+        const user = JSON.parse(authData);
+        return user.uid || 'anonymous';
+      }
+    } catch {}
+    return 'anonymous';
+  }
+
+  private static getKey(baseKey: string): string {
+    const uid = this.getUserId();
+    // Do not scope THEME, AUTH_TOKEN
+    if (baseKey === STORAGE_KEYS.THEME || baseKey === STORAGE_KEYS.AUTH_TOKEN) return baseKey;
+    return `${baseKey}_${uid}`;
+  }
+
   static getProfile(): UserProfile | null {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.USER_PROFILE));
       return data ? JSON.parse(data) : null;
     } catch {
       return null;
@@ -74,7 +94,7 @@ export class StorageService {
 
   static saveProfile(profile: UserProfile): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.USER_PROFILE), JSON.stringify(profile));
       fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,7 +105,7 @@ export class StorageService {
 
   static getAnswers(): Record<string, number> {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.ASSESSMENT_ANSWERS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.ASSESSMENT_ANSWERS));
       return data ? JSON.parse(data) : {};
     } catch {
       return {};
@@ -94,13 +114,13 @@ export class StorageService {
 
   static saveAnswers(answers: Record<string, number>): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.ASSESSMENT_ANSWERS, JSON.stringify(answers));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.ASSESSMENT_ANSWERS), JSON.stringify(answers));
     } catch {}
   }
 
   static getAssessmentIndex(): number {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.ASSESSMENT_INDEX);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.ASSESSMENT_INDEX));
       return data ? parseInt(data, 10) : 0;
     } catch {
       return 0;
@@ -109,13 +129,13 @@ export class StorageService {
 
   static saveAssessmentIndex(index: number): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.ASSESSMENT_INDEX, index.toString());
+      localStorage.setItem(this.getKey(STORAGE_KEYS.ASSESSMENT_INDEX), index.toString());
     } catch {}
   }
 
   static getResult(): AssessmentResult | null {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.ASSESSMENT_RESULT);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.ASSESSMENT_RESULT));
       return data ? JSON.parse(data) : null;
     } catch {
       return null;
@@ -124,7 +144,7 @@ export class StorageService {
 
   static saveResult(result: AssessmentResult): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.ASSESSMENT_RESULT, JSON.stringify(result));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.ASSESSMENT_RESULT), JSON.stringify(result));
       fetch('/api/results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,9 +153,24 @@ export class StorageService {
     } catch {}
   }
 
+  static getAiAnalysis(): any | null {
+    try {
+      const data = localStorage.getItem(this.getKey('restart_ai_analysis'));
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  static saveAiAnalysis(analysis: any): void {
+    try {
+      localStorage.setItem(this.getKey('restart_ai_analysis'), JSON.stringify(analysis));
+    } catch {}
+  }
+
   static getRecommendations(): Recommendation[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.RECOMMENDATIONS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.RECOMMENDATIONS));
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -144,13 +179,13 @@ export class StorageService {
 
   static saveRecommendations(recs: Recommendation[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.RECOMMENDATIONS, JSON.stringify(recs));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.RECOMMENDATIONS), JSON.stringify(recs));
     } catch {}
   }
 
   static getSavedCareers(): SavedCareerItem[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.SAVED_CAREERS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.SAVED_CAREERS));
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -159,13 +194,13 @@ export class StorageService {
 
   static saveSavedCareers(items: SavedCareerItem[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.SAVED_CAREERS, JSON.stringify(items));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.SAVED_CAREERS), JSON.stringify(items));
     } catch {}
   }
 
   static getChatHistory(): ChatMessage[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.CHAT_HISTORY));
       return data ? JSON.parse(data) : [];
     } catch {
       return [];
@@ -174,13 +209,13 @@ export class StorageService {
 
   static saveChatHistory(messages: ChatMessage[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(messages));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.CHAT_HISTORY), JSON.stringify(messages));
     } catch {}
   }
 
   static getNotifications(): AppNotification[] {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.NOTIFICATIONS));
       return data ? JSON.parse(data) : defaultNotifications;
     } catch {
       return defaultNotifications;
@@ -189,13 +224,13 @@ export class StorageService {
 
   static saveNotifications(notifs: AppNotification[]): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.NOTIFICATIONS), JSON.stringify(notifs));
     } catch {}
   }
 
   static getNotificationSettings(): NotificationSettings {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.NOTIFICATION_SETTINGS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.NOTIFICATION_SETTINGS));
       return data ? JSON.parse(data) : defaultNotificationSettings;
     } catch {
       return defaultNotificationSettings;
@@ -204,13 +239,13 @@ export class StorageService {
 
   static saveNotificationSettings(settings: NotificationSettings): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.NOTIFICATION_SETTINGS, JSON.stringify(settings));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.NOTIFICATION_SETTINGS), JSON.stringify(settings));
     } catch {}
   }
 
   static getAISettings(): AISettings {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.AI_SETTINGS);
+      const data = localStorage.getItem(this.getKey(STORAGE_KEYS.AI_SETTINGS));
       return data ? JSON.parse(data) : defaultAISettings;
     } catch {
       return defaultAISettings;
@@ -219,7 +254,7 @@ export class StorageService {
 
   static saveAISettings(settings: AISettings): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.AI_SETTINGS, JSON.stringify(settings));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.AI_SETTINGS), JSON.stringify(settings));
     } catch {}
   }
 
@@ -268,9 +303,9 @@ export class StorageService {
 
   static saveFeedback(feedback: FeedbackSubmission): void {
     try {
-      const list = JSON.parse(localStorage.getItem(STORAGE_KEYS.FEEDBACK) || '[]');
+      const list = JSON.parse(localStorage.getItem(this.getKey(STORAGE_KEYS.FEEDBACK)) || '[]');
       list.push(feedback);
-      localStorage.setItem(STORAGE_KEYS.FEEDBACK, JSON.stringify(list));
+      localStorage.setItem(this.getKey(STORAGE_KEYS.FEEDBACK), JSON.stringify(list));
       fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -281,8 +316,19 @@ export class StorageService {
 
   static clearAll(): void {
     try {
-      localStorage.clear();
-      StorageService.applyThemeToDocument('dark');
+      const theme = this.getTheme();
+      const uid = this.getUserId();
+      // Only clear keys that belong to this user
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.endsWith(`_${uid}`) && !key.includes('restart_registered_users')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      
+      StorageService.applyThemeToDocument(theme);
     } catch {}
   }
 }
